@@ -1,0 +1,9 @@
+description  "Pico Continuous Authentication service"
+author "David Llewellyn-Jones <David.Llewellyn-Jones@cl.cam.ac.uk>"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+
+exec /usr/bin/pico-continuous

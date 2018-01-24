@@ -1,0 +1,111 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" (C) Copyright 2016 David Llewellyn-Jones <David.Llewellyn-Jones@cl.cam.ac.uk>,
+.\"
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH pico-pair 8 "2017-07-09"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.mso www.tmac
+.SH NAME
+pico-pair \- Pair your Pico for use with
+.B pam_pico
+.SH SYNOPSIS
+.B pico-pair
+.RI [ options ]
+.SH DESCRIPTION
+This manual page documents briefly the
+.B pico-pair
+command.
+.PP
+Before you can use the Pico app to authenticate to a device, the user
+must first pair the Pico app with the device. The 
+.B pico-pair 
+command allows this pairing to be performed.
+Calling 
+.B pico-pair
+will either take the user through the pairing process on the command 
+line, or will open a GTK user interface, depending on the command line 
+options chosen.
+.PP
+If the command line variant is chosen, the user will be asked to enter 
+their password, after which a QR code will be displayed in the 
+terminal for the user to scan using their Pico app.
+.PP
+If the GUI variant is chosen, an assistant window will be opened that 
+will lead the user through the pairing process. 
+Once again, this will ultimately end up with the user being asked to 
+scan a QR code with their Pico app to complete the pairing process.
+.PP
+It's likely that both the command-line and GUI version must be run as 
+root in order for the pairing to complete successfully.
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invoke bold face and italics,
+.\" respectively.
+.SH OPTIONS
+This program follows the usual GNU command line syntax, with long
+options starting with two dashes (`-').
+A summary of options is included below.
+.TP
+.B \-h, \-\-help
+Show summary of options.
+.TP
+\fB\-u\fR, \fB\-\-user\fR \fI\,USERNAME\/\fR
+The username of the user to pair. If omitted 
+.B pico-pair
+will use the current user, which will most likely be root and therefore 
+not the intended user.
+.TP
+.B \-v, \-\-verbose
+Display more debug output during pairing.
+.TP
+.B \-g, \-\-gui
+Use the GTK GUI version, otherwise perform pairing using the terminal.
+.TP
+\fB\-d\fR, \fB\-\-datadir\fR \fI\,DIRECTORY\/\fR
+Set the directory to read assets from, such as the GtkBuilder interface 
+files. 
+By default this is set to 
+.IR /usr/share/pam-pico 
+(although this may have been changed at compile-time using compiler 
+options).
+.TP
+\fB\-k\fR, \fB\-\-keydir\fR \fI\,DIRECTORY\/\fR
+Set the directory to read user credentials from. 
+This folder contains the public keys of all paired users. 
+The access rights of the files in this directory should be set so that 
+they are readable only by root. 
+By default this is set to 
+.IR /etc/pam-pico
+(although this may have been changed at compile-time using compiler 
+options).
+.SH EXAMPLES
+The following examples will attempt to run 
+.B pico-pair
+as root.
+.TP
+.B sudo pico-pair --user $USER
+Pair the current user at the command line.
+.TP
+.B gksu pico-pair --gui --user $USER
+Open the graphical user interface for pairing the current user.
+.SH SEE ALSO
+.BR pam_pico (8),
+.BR pico-continuous (8),
+.BR pico-test (8)
+.SH AUTHOR
+.B pico-pair 
+was written by 
+.URL https://mypico.org "Team Pico".
+

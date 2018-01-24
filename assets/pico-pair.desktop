@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=Pico Pair
+GenericName=Pico Pair
+Comment=Pair your Pico app to log in to a computer.
+Keywords=pam;login;authenticate;pair;pico;
+#Exec=sh -c "pkexec pico-pair --gui --user $USER"
+Exec=sh -c "gksu -D \"Pico Pair\" -k \"pico-pair --gui --user $USER\""
+Icon=/usr/share/pam-pico/icons/pico-pair.png
+Type=Application
+Terminal=false
+Categories=Utility;
+

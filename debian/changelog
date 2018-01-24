@@ -1,0 +1,27 @@
+libpam-pico (0.0.2-1) unstable; urgency=medium
+
+  * Add bluez dependency.
+  * Support continuous authentication.
+  * Automatically drop to Rendezvous Point if Bluetooth isn't available.
+  * Authentication now accessed through a service using a dbus interface.
+  * Username sent to Pico to improve pairing naming.
+  * Improved unit tests.
+  * Improved documentation.
+  * Log outout verbosity reduced.
+  * Remove dependency on pico-remove.
+  * GUI pairing interface.
+
+ -- David Llewellyn-Jones <David.Llewellyn-Jones@cl.cam.ac.uk>  Tue, 11 Jul 2017 14:45:32 +0100
+
+libpam-pico (0.0.1-1) unstable; urgency=medium
+
+  * Reduce telemetry events generated when idling
+
+ -- David Llewellyn-Jones <David.Llewellyn-Jones@cl.cam.ac.uk>  Thu, 03 Nov 2016 19:49:45 +0200
+
+libpam-pico (0.0.0-1) unstable; urgency=medium
+
+  * Initial release (Closes: #2)
+
+ -- David Llewellyn-Jones <David.Llewellyn-Jones@cl.cam.ac.uk>  Wed, 07 Sep 2016 02:04:35 +0200
+

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+ "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1.0/policyconfig.dtd">
+<policyconfig>
+  <vendor>Pico</vendor>
+  <vendor_url>https://www.mypico.org</vendor_url>
+  <icon_name>pico-pair</icon_name>
+
+  <action id="org.mypico.pico-pair">
+    <description gettext-domain="pico-pair">Pair a Pico app with this computer</description>
+    <message gettext-domain="pico-pair">Authentication is required to pair your Pico app with this machine</message>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pico-pair</annotate>
+    
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin</allow_active>
+    </defaults>
+
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pico-pair</annotate>
+    <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
+ 
+ </action>
+
+</policyconfig>

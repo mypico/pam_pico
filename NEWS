@@ -1,0 +1,22 @@
+pam_pico-0.0.2-1: 11-Jul-2017
+  - Support continuous authentication
+  - Add bluez dependency.
+  - Support continuous authentication.
+  - Automatically drop to Rendezvous Point if Bluetooth isn't available.
+  - Authentication now accessed through a service using a dbus interface.
+  - Username sent to Pico to improve pairing naming.
+  - Improved unit tests.
+  - Improved documentation.
+  - Log outout verbosity reduced.
+  - Remove dependency on pico-remove.
+  - GUI pairing interface.
+
+pam_pico-0.0.1-1: 3-Nov-2016
+  - Reduce telemetry events generated when idling
+
+pam_pico-0.00-1: 7-Sep-2016
+  - Initial packaged version
+
+pam_pico-0.00: 9-Jun-2016
+  - Initial version
+

@@ -1,0 +1,7 @@
+variableScope
+unusedFunction:src/gdbus-generated.c
+unusedFunction:src/authconfig.c
+unusedFunction:src/auththread.c
+unusedFunction:src/service.c
+unusedFunction:src/servicervp.c
+

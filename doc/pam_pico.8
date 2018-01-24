@@ -1,0 +1,120 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" (C) Copyright 2017 Pico Project <David.Llewellyn-Jones@cl.cam.ac.uk>,
+.\"
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH pam_pico 8 "2017-07-09"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.mso www.tmac
+.SH NAME
+pam_pico \- PAM module for Pico authentication
+.SH SYNOPSIS
+.B pam_pico.so
+.RI [ options ]
+.SH DESCRIPTION
+This manual page documents briefly the
+.B pam_pico
+authentication module.
+.PP
+It can be added to a 
+.BR pam (3)
+chain to authenticate the user using their Pico 
+app, allowing them to log in using just their smartphone, either by
+scanning a QR code, or entirely seamlessly using Bluetooth.
+If using Bluetooth, the user's session will also be automatically locked
+once the user leaves Bluetooth range.
+.PP
+This module only kicks off the authentication. The actual authentication, 
+as well as the continuous part of
+.I continuous authentication
+, is performed by the
+.BR pico-continuous (8) 
+service. 
+The module advertises itself using a
+.I code 
+which the Pico must read in order to initiate the authentication. There 
+are several ways this can be read. 
+The most common are for it to either be read by the Pico by scanning a 
+QR code, or for it to be broadcast to the Pico as a Bluetooth beacon.
+.PP
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invoke bold face and italics,
+.\" respectively.
+.SH OPTIONS
+A summary of options is included below.
+.TP
+.B json
+Output the code as a JSON string.
+.TP
+.B colorless_utf8
+Output the code as a QR code in colourless UTF8 format, which renders 
+four pixels per character.. The default format similarly uses UTF8, but 
+includes character sequences to control the colour. 
+This flag uses the same characters, but without the colour control 
+sequences.
+.TP
+.B ansi
+Output the code as a QR code in ANSI format. Each QR code pixel is 
+rendered as two horizontally aligned characters.
+Consequently this will result in a rather large image being produced.
+.TP
+.B tt_tag
+Render the QR code in UTF8 format, but include \<tt\> tags to ensure the 
+QR code is rendered in a fixed with font.
+.TP
+.B no_input
+Set this flag to prevent the module requesting user input. Depending on
+the PAM client implementation, input may be required to ensure the 
+Pico response is collected. 
+In other implementations, asking for a response will block the 
+authentication from proceeding until the user has hit the enter key. 
+This flag allows the input request to be controlled to take account of 
+these different implementation specifics.
+.TP
+.B any_user
+The module can either authenticate a specific user (passed through a PAM 
+variable), or it can determine the user to authenticate based on the 
+key used by the Pico.
+A simple way to appreciate this difference is to consider the difference 
+between the login process and the unlock process. 
+In the former case, any user can log in and the correct session will be 
+loaded for that user. 
+In the latter case, only the user with the locked session is entitled 
+to unlock it.
+Setting this flag will allow any user to authenticate against the module.
+.TP
+.B bluetooth
+This flag will set the channel for authentication to be Bluetooth. 
+If this flag is omitted, HTTP/HTTPS will be used instead, via the
+Rendezvous Point.
+.TP
+.B no_msg
+When set, output of the code will be suppressed entirely.
+.TP
+.B continuous
+When set, continuous authentication will be performed. This means that 
+the Pico will continue periodic authentications with the
+.BR pico-continuous (8) 
+service. 
+If authentication fails for whatever reason (for example, the Pico moves 
+out of Bluetooth range) then a signal will be made to lock the session.
+.SH SEE ALSO
+.BR pico-continuous (8),
+.BR pico-pair (8),
+.BR pico-test (8)
+.SH AUTHOR
+pam_pico was written by 
+.URL https://mypico.org "Team Pico".
+

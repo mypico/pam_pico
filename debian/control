@@ -1,0 +1,19 @@
+Source: libpam-pico
+Priority: optional
+Maintainer: David Llewellyn-Jones <David.Llewellyn-Jones@cl.cam.ac.uk>
+Build-Depends: debhelper (>=9), autotools-dev, dh-systemd (>= 1.5), liburl-dispatcher1-dev, libsoup2.4-dev (>= 2.4)
+Standards-Version: 3.9.6
+Section: libs
+Homepage: https://www.mypico.org
+#Vcs-Git: git://anonscm.debian.org/collab-maint/libpam-pico.git
+#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/libpam-pico.git
+Vcs-Git: git@gitlab.dtg.cl.cam.ac.uk:pico/pam.git
+Vcs-Browser: https://gitlab.dtg.cl.cam.ac.uk/pico/pam
+
+Package: libpam-pico
+Architecture: any
+Depends: libpicobt-run (>= 0.0.1), libpico1 (>= 0.0.2), gksu, liburl-dispatcher1, ${shlibs:Depends}, libsoup2.4-1 (>= 2.4), ${misc:Depends}
+Description: Pico PAM module
+ Allows Pico to be used to authenticate to the system. Can be used for
+ logging in to the system, unlocking, sudo auth and so on.
+

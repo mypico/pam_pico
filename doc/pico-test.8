@@ -1,0 +1,74 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" (C) Copyright 2016 David Llewellyn-Jones <David.Llewellyn-Jones@cl.cam.ac.uk>,
+.\"
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH pico-test 8 "2017-07-09"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.mso www.tmac
+.SH NAME
+pico-test \- Perform a test authentication using the
+.BR pico-continuous (8) 
+service.
+.SH SYNOPSIS
+.B pico-test
+.RI [ options ]
+.SH DESCRIPTION
+This manual page documents briefly the
+.B pico-test
+program.
+.PP
+The 
+.B pico-test
+program can be used to test the 
+.BR pico-continuous (8)
+service. 
+It will send dbus messages to the service requesting to authenticate, 
+display the returned QR code on the command line and return the result of 
+any authentication that the service subsequently performs.
+.PP
+This allows authentication to be tested without having to go via the PAM 
+interface. 
+To test the service using the PAM interface, something like 
+.BR pamtester (1)
+can be used instead.
+.PP
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invoke bold face and italics,
+.\" respectively.
+.SH OPTIONS
+This program follows the usual GNU command line syntax, with long
+options starting with two dashes (`-').
+However, currently
+.B pico-test 
+doesn't accept any options or parameters.
+.SH EXAMPLES
+Use of 
+.B pico-test 
+is pretty basic.
+.TP
+.B pico-test
+Perform a test authentication. A QR code will be sent to 
+.BR stdout (3), 
+and the authentication log output will be sent to 
+.BR syslog (3).
+.SH SEE ALSO
+.BR pam_pico (8),
+.BR pico-pair (8),
+.BR pico-continuous (8)
+.SH AUTHOR
+pico-test was written by 
+.URL https://mypico.org "Team Pico".
+

@@ -1,0 +1,56 @@
+# Object files
+*.o
+*.def
+*.exp
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.pyc
+
+# autoconf
+
+/autom4te.cache/
+/.dirstamp
+/ChangeLog
+/Makefile
+/assets/Makefile
+/assets/icons/Makefile
+/config.h
+/config.log
+/config.status
+/knot3d
+/debian/knot3d.debhelper.log
+/debian/knot3d/
+/src/Makefile
+/stamp-h1
+.deps/
+
+# Specific files
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

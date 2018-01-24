@@ -1,0 +1,11 @@
+[Unit]
+Description=Pico Continuous Authetication service
+
+[Service]
+WorkingDirectory=/usr/share/pam-pico
+ExecStart=/usr/bin/stdbuf -oL /usr/bin/pico-continuous
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

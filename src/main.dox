@@ -1,0 +1,336 @@
+/**
+@mainpage
+
+\section pam_pico pam_pico Overview
+
+<b>Version $(VERSION)</b>
+
+\subsection story A story
+
+The air was still damp from the rain and McCreedy felt the gravel crunch under his feet, lubricated by the puddles of water. He moved around the crime scene. He'd seen plenty of nasty murders before, but none of them quite so cold, so calculated, as what he was looking at right now.
+
+O'Neal, the pathologist on call that night, had covered the body in a sheet, hiding the worst of it. On the left-hand side of the body, just next to the dead man's shoulder, was a pot of green paint. On the right had side, at knee-height, the paint had been used to write the initials BMC on the ground. Just touching the man's fingers, a police-issue pistol.
+
+But this was no policeman. The gun didn't belong to the victim, and nor had the letters been written by him either. That part McCreedy had established as soon as he'd arrived at the scene, before O'Neal had done her work.
+
+Yes, this wasn't a man who'd scrawled a final, last note of accusation on the ground next to him. This was a man who'd fallen ten storeys from a building, landing on top of an accusation scrawled on the floor several hours before.
+
+"Inexplicable, don't you think?" O'Neal had sauntered up alongside. "How does a man fall ten storeys with his pockets full of eggs, but without breaking a single one?".
+
+McCreedy looked back at O'Neal thoughtfully. "Inexcusable? Yes. Inexplicable? Not at all." This was no inexplicable situation; McCreedy knew exactly what had happened. More to the point, he knew exactly who was responsible for murdering the man too. What he didn't yet know, and what he knew he had to find out, was how he was going to prove it.
+
+\subsection summary Summary
+
+This manual documents `pam_pico` version $(VERSION). `pam_pico` is a Pluggable Authentication Module (PAM) which, once installed and configured, allows you to log in to your computer using Pico.
+
+\subsection structure Documentation structure
+
+If you're a developer and are interested in conbtributing to the source code, the API documentation linked to above may be of interest. This gives an idea about what the different parts of the source code do.
+
+However, most people will just want to use the PAM as quickly as possible. If this is you, everything you need to know should be on this page.
+ 
+\subsection linuxinstall Linux installation
+
+If you're running Ubuntu you can install `pam_pico` directly from the Pico PPA. Enter the following commands to add the PPA to your system:
+
+\verbatim
+sudo add-apt-repository ppa:mypico/ppa
+sudo apt-get update
+\endverbatim
+
+Then install `pam_pico` using the following commands. As well as `pam_pico`, this will also automatically install all of its dependencies.
+
+\verbatim
+sudo apt install pam_pico
+\endverbatim
+
+If you don't want to add the Pico PPA, you can also download the latest package from the [Pico website](https:mypico.org). You'll need to install all of the dependencies yourself if you do it this way (see the @ref deps section). Then use the following to install `pam_pico`:
+
+\verbatim
+sudo dpkg -i libpam-pico_0.0.2-1_amd64.deb
+\endverbatim
+
+This will install the `pan_pico` PAM, the `pico-continuous` service and the `pico-pair` pairing tool.
+
+\subsection build Building from source
+
+Ensure you have all of the dependencies listed in \ref deps below. Then something along the following lines should do it.
+
+\verbatim
+git clone git@gitlab.dtg.cl.cam.ac.uk:pico/pam.git
+autoreconf --install
+./configure
+make
+\endverbatim
+
+To generate the DEB packages on a Debian-based system run something like the following:
+
+\verbatim
+debuild -us -uc -b --lintian-opts -X changes-file
+\endverbatim
+
+\subsubsection dicbuild Building the documentation
+
+The documentation you're reading now was generated using doxygen. If you want to generate it yourself you should get hold of the `pm_pico` source, then use the following commands to set things up.
+
+\verbatim
+autoreconf --install
+./configure
+\endverbatim
+
+You can now generate the documentation using
+
+\verbatim
+make doxygen
+\endverbatim
+
+You'll need various dependencies for this, including:
+ - build-essentials
+ - make
+ - doxygen
+ - libpico1
+ - libpicobt
+ - libqrencode
+ - libssl
+ - graphviz
+
+The html files will be generated and output to the docs folder.
+
+\subsection deps Dependencies
+
+On Linux libpico requires the following runtime dependencies (at least):
+
+ - libpico-run, version 0.0.1 or later
+ - libpicobt-run, version 0.0.1 or later
+ - libssl, version 1.0.0 or later
+ - libcurl3
+ - libqrencode3
+ - libbluetooth3, version 4.91 or later
+ - libc6, version 2.14 or later
+ - liburl-dispatcher1
+ - gksu
+
+To build on Linux you'll need the following (at least):
+ - libpicobt-dev, version 0.0.1 or later
+ - libpicobt-run, version 0.0.1 or later
+ - libcurl4-openssl-dev
+ - libqrencode-dev
+ - libssl-dev
+ - libbluetooth-dev, version 4.91 or later
+ - git
+ - gcc
+ - make
+ - check
+ - pkg-config
+ - autotools-dev
+ - devscripts
+ - debhelper
+ - openssh-client
+ - dh-systemd
+ - liburl-dispatcher1-dev
+
+\subsection logs Log files
+
+All of the applications installed by `pam_pico` write logs using syslog. The default location for log output is `/var/log/syslog`.
+
+\subsection configure Configuring the system
+
+Once `pam_pico` package has been installed, you'll be forgiven for thinking that nothing has changed. That's because in order to make use of it, you'll also need to configure your PAM stack to call the new module. This involves adding a line to the configuration file for each application using the PAM stack, where you want Pico to be used instead of passwords. Each of these configuration files can be found in '/etc/pam.d'.
+
+The instructions in the \ref configure-pam section explains how to do this. You may also want to configure the `pico-continuous` service, as explained in section \ref configure-service, however this second step is optional.
+
+\subsubsection configure-pam Configuring pam_pico
+
+There are many good guides about how to use PAM, such as the very thorough <a href="http://linux-pam.org/Linux-PAM-html/Linux-PAM_SAG.html">Linux-PAM System Administrators' Guide</a>. We provide just a brief overview here. If you're already familiar with PAM configuration, you should be able to get what you need from the `pam_pico` man page.
+
+Having installed the packages, you will still need to add the `pam_pico` shared
+object to your PAM stack. You can do this by editing the files in the
+`/etc/pam.d` folder.
+
+Each of the files in this folder corresponds to an application that makes use
+of PAM for authentication. For example you may find files for `sudo`, `unity`,
+`lightdm` and `login` in here.
+
+For each of the applications you want Pico to work with, you'll have to add
+`pam_pico` to the appropriate file in this folder.
+
+Let's consider an example. Suppose you want to add Pico functionality to unity.
+Open the `unity` file in a text editor. You should see something like this:
+
+```
+@include common-auth
+auth optional pam_gnome_keyring.so
+```
+
+That's a fairly basic PAM config file (the actual hard work is going on inside
+the `common-auth` file that's included in this one).
+
+To add Pico functionality, you'd need to add a new line to the top of the file
+like this.
+```
+auth    requisite /usr/lib/x86_64-linux-gnu/security/pam_pico.so bluetooth any_user no_input colorless_utf8 continuous
+@include common-auth
+auth optional pam_gnome_keyring.so
+```
+
+As you can see we've added an `auth` line. Here's what the various parts of this additional line
+mean:
+
+ 1. `auth` means that we're adding a module for *authentication*.
+ 2. `requisite` means that if authentication fails with this module, the
+ overall authentication will fail, and no more lines will be executed.
+ 3. `/usr/lib/x86_64-linux-gnu/security/pam_pico.so` is a reference to the
+ `pam_pico` module. This means the task of authentication will be handled
+ by this module.
+ 4. `bluetooth any_user no_input colorless_utf8 continuous` are arguments
+ passed to the `pam_pico` module. These are briefly described below.
+
+The arguments that can be added to the end of the line are the following. Some of these can also be added to the service configuration file (see the {@link configure-service} section), but values added as arguments as shown here override those in the configuration file.
+
+ - `json`:
+
+   Output the code as a JSON string.
+
+ - `colorless_utf8`:
+
+    Output the code as a QR code in colourless UTF8 format, which renders four pixels per character.. The default format similarly uses UTF8, but includes  character sequences to control the colour.  This flag uses the same characters, but without the colour control sequences.
+
+ - `ansi`:
+
+   Output the code as a QR code in ANSI format. Each QR code pixel is rendered  as two horizontally aligned characters.  Consequently this will result in a rather large image being produced.
+
+ - `tt_tag`:
+
+   Render the QR code in UTF8 format, but include `&lt;tt&gt;` tags to ensure the QR  code is rendered in a fixed with font.
+
+ - `no_input`:
+
+   Set this flag to prevent the module requesting user input. Depending on the PAM client implementation, input may be required to ensure  the  Pico  response  is collected.   In  other  implementations,  asking  for a response will block the authentication from proceeding until the user has hit the enter key.  This flag allows  the  input  request to be controlled to take account of these different implementation specifics.
+
+ - `any_user`:
+
+   The module can either authenticate a specific user (passed through a PAM  variable),  or  it  can determine the user to authenticate based on the key used by the Pico.  A simple way to appreciate this difference is to consider  the  difference  between the login process and the unlock process.  In the former case, any user can log in and the correct session will be loaded for that  user.   In the  latter  case,  only the user with the locked session is entitled to unlock it.  Setting this flag will allow any user to authenticate against the module.
+
+ - `bluetooth`:
+
+   This flag will set the channel for authentication to  be  Bluetooth.   If  this flag is omitted, HTTP/HTTPS will be used instead, via the Rendezvous Point.
+
+ - `no_msg`:
+
+   When set, output of the code will be suppressed entirely.
+
+ - `continuous`:
+
+   When set, continuous authentication will be performed. This means that the Pico will continue periodic authentications with the pico-continuous(8) service.  If authentication  fails  for  whatever reason (for example, the Pico moves out of Bluetooth range) then a signal will be made to lock the session.
+
+\subsubsection configure-service Configuring pico-continuous
+
+The `pico-continuous` service is run as a systemd daemon. It can be controlled using the `systemctl` command. For example:
+
+```
+systemctl status pico-continuous.service
+```
+Once installed the service is configured to run at start up and stay running continuously until the system is shut down. In order to use Pico, you should leave the service running.
+
+Many of the configuration options that can be passed as arguments to `pam_pico` are actually passed directly on to the `pico-continuous` service, which performs the actual authentication with your Pico. Rather than add these options to the command line, they can also be configured in the `config.txt` configuration file found in the `/etc/pam-pico` directory.
+
+The `config.txt` file is optional, but if it does exist it must be formatted as a <a href="http://json.org/">JSON</a> file. Below are the possible key-value pairs allowed in this file.
+
+ - `continuous`
+
+   This can take a value of either 0 or 1, and prescribes whether continuous authentication should be used or not. Use 1 to use continuous authentication, 0 otherwise. Note that setting this value to 1 will currently force the channel to use Bluetooth. The default value is 0.
+
+ - `channeltype`
+
+    This can take a value of either `rvp` or `bluetooth`. The former will use HTTP as the authentication channel, routed via a rendezvous point. The latter will use Bluetooth for the authentication channel. In either case the channel is considered untrusted, which means Pico provides its own confidential and authentic channel on top of the method used. The default value is `rvp`.
+    
+ - `beacons`
+
+   This can take a value of either 0 or 1, and prescribes whether Bluetooth beacons are sent out advertising to nearby Picos. A nearby Pico that hears the beacon and is paired with the device will offer to the user to authenticate, or potentially authenticate automatically depending on how the Pico app is configured. The default value is 0.
+
+ - `anyuser`
+
+   This can take a value of either 0 or 1. If set to 0, `pam_pico` will expect a specific user to log in. This reflects the case where a user has locked their machine, so only they are entitled to unlock it. If this is set to 1, any user paired with the system can authenticate. This reflects the case of a login screen, where any user with an account is entitled to log in. The default value is 0.
+
+
+Not all options need to be included in the file. If they're not the default is used. However, note that any of the values in the `config.txt` will  be overriden by any values specified as arguments to the PAM. An example `config.txt` file might look something like the following.
+
+```
+{
+  "continuous"  : 1,
+  "channeltype" : "bluetooth",
+  "beacons"     : 1
+}
+```
+
+For more information about the `pico-continuous` service you can also refer to its man page.
+
+\subsubsection pairing Pairing your Pico app with your computer
+
+Having installed and configured `pam_pico`, you must now pair with the system before you can use it. Each user who wants to authenticate to the system using the Pico app must follow the same process.
+
+Pairing is performed using the `pico-pair` application. The application has to run as root in order to get write-access to the keypairing directory on the system. It also takes various command line arguments. For full details of these arguments check the `pico-pair` man page.
+
+To use the default terminal interface you can use the following command:
+
+```
+sudo pico-pair --user $USER
+```
+
+This will ask you to enter your user password, before displaying a QR code on the terminal that you'll need to scan with your Pico app.
+
+The GUI version walks you through the process a little more gently. This can be started by entering `pico-pair` on the Unity dash, or by entering the following command at the terminal.
+
+```
+gksu "pico-pair --gui --user $USER"
+```
+
+In both cases, you'll also need to ensure your phone is *bluetooth paired* with your computer. Bluetooth pairing can be performed through the System Settings panel on Ubuntu, or through the <a href="https://help.ubuntu.com/stable/ubuntu-help/bluetooth-connect-device.html">Bluetooth icon on the menu bar</a>.
+
+Once you've configured `pam_pico`, paired using `pico-pair` and established a trusted Bluetooth pairing between your computer and your phone, you're ready to authenticate using Pico without the need for passwords.
+
+*/
+
+/**
+ * @defgroup Service pico-continuous
+ * @brief The `pico-continuous` systemd service
+ *
+ * Although `pam_pico` is used to kick-off the authentication, the actual work
+ * is performed by the pico-continous service. pam_pico calls the service using
+ * dbus, and the service then interacts with the Pico app.
+ * 
+ */
+
+/**
+ * @defgroup PAM pam_pico
+ * @brief The `pam_pico` Pluggable Authentication Module
+ *
+ * A PAM is used to log in to your Linux machine. When you log in to the
+ * desktop, or type your password after using `sudo`, PAM is what actually does
+ * the work. The `pam_pico` PAM allows you to authenticate to your computer
+ * using the Pico app rather than using a password.
+ * 
+ */
+
+/**
+ * @defgroup Pairing pico-pair
+ * @brief The `pico-pair` app is for pairing your Pico app with your computer.
+ *
+ * Before you can log in usin the Pico app, you must first pair the app with
+ * your machine. The `pico-pair` app allows you to perform this pairing, either
+ * using a GUI wizard or on the command line.
+ * 
+ */
+
+/**
+ * @defgroup Testing Testing
+ * @brief Test and example code.
+ *
+ * This code isn't needed to run Pico, but it may provide useful tests or
+ * example code if you're trying to understand how things fit together
+ * and work.
+ * 
+ */
+
+
+

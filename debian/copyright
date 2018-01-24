@@ -1,0 +1,14 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: libpam-pico
+Source: <https://www.mypico.org>
+
+Files: *
+Copyright: 2016 Pico Project
+License: Copyright Pico Project 2016, all rights reserved.
+ Copyright Pico Project 2016, all rights reserved.
+
+Files: debian/*
+Copyright: 2016 Pico Project <David.Llewellyn-Jones@cl.cam.ac.uk>
+License: Copyright Pico Project 2016, all rights reserved.
+ Copyright Pico Project 2016, all rights reserved.
+

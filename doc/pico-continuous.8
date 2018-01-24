@@ -1,0 +1,78 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" (C) Copyright 2016 David Llewellyn-Jones <David.Llewellyn-Jones@cl.cam.ac.uk>,
+.\"
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH pico-continuous 8 "2017-07-09"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.mso www.tmac
+.SH NAME
+pico-continuous \- Continuous authentication service for use with 
+.B pam_pico
+.SH SYNOPSIS
+.B pico-continuous
+.RI [ options ]
+.SH DESCRIPTION
+This manual page documents briefly the
+.B pico-continuous
+service.
+.PP
+The 
+.B pico-continuous
+service is usually run as a background service (daemon) and in its default 
+configuration is set up to run at startup using 
+.BR systemd (1) .
+The 
+.BR pam_pico (8)
+authentication module interacts with the service by dbus and it's the 
+service which actually performs the authentication and continuous 
+authentication for the module. 
+The service should be started, stopped and queried using 
+.BR systemctl (1) .
+See the 
+.B examples 
+section for how this can be done.
+.PP
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invoke bold face and italics,
+.\" respectively.
+.SH OPTIONS
+This program follows the usual GNU command line syntax, with long
+options starting with two dashes (`-').
+However, currently
+.B pico-continuous 
+doesn't accept any options or parameters.
+.SH EXAMPLES
+The service should be started, stopped and queried using 
+.BR systemctl (1)
+. 
+For example:
+.TP
+.B systemctl start pico-continuous
+Start the continuous authentication service.
+.TP
+.B systemctl stop pico-continuous
+Stop the continuous authentication service.
+.TP
+.B systemctl status pico-continuous
+Query the status of the continuous authentication service.
+.SH SEE ALSO
+.BR pam_pico (8),
+.BR pico-pair (8),
+.BR pico-test (8)
+.SH AUTHOR
+pico-continuous was written by 
+.URL https://mypico.org "Team Pico".
+

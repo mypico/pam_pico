@@ -1,0 +1,78 @@
+/* the page title */
+#titlearea {
+	border-bottom: 2px solid rgba(255,255,255,.5);
+	padding: 8px 0;
+	background-color: #f09146;
+	color: white;
+}
+#projectlogo {
+	vertical-align: middle;
+	padding: 0 20px;
+}
+#projectlogo img {
+	height: 55px;
+}
+
+/* the main navigation bar */
+.sm-dox {
+	background-image: none;
+	background-color: #f09146;
+}
+/* the main navigation bar menu items */
+.sm-dox a, .sm-dox a:focus, .sm-dox a:hover, .sm-dox a:active {
+	color: white;
+	text-shadow: none;
+}
+.sm-dox a, .sm-dox a:focus, .sm-dox a:active, .sm-dox a:hover, .sm-dox a.highlighted {
+	background-image: none;
+	border-right: 1px rgba(0,0,0,.5);
+}
+
+/* hover on the main navigation bar */
+.sm-dox a:hover {
+	background-color: rgba(255,255,255,.5);
+}
+/* hover on a menu item */
+.sm-dox ul a:hover {
+	background-image: none;
+	background-color: #888;
+	text-shadow: none;
+}
+
+/* search box */
+#MSearchBox .left, #MSearchField, #MSearchBox .right {
+	background: white none;
+}
+#MSearchBox .left {
+	border-radius: 33% 0 0 33%;
+}
+#MSearchBox .right {
+	border-radius: 0 33% 33% 0;
+}
+#MSearchResultsWindow {
+	background-color: white;
+}
+span.SRScope {
+	color: rgba(0,0,0,.6);
+}
+
+/* the content header */
+div.header {
+	background-image: none;
+	background-color: #f0f0f0;
+	border-bottom: 1px solid #ccc;
+}
+
+/* lines */
+hr {
+	border-color: #ccc;
+}
+
+/* alternate rows in the files list */
+div.directory {
+	border-top: none;
+	border-bottom: none;
+}
+.directory tr.even {
+	background-color: #f8f8f8;
+}
