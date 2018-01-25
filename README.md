@@ -1,8 +1,8 @@
-# pam_pico ReadMe
+# pam-pico ReadMe
 
 The Pico project is liberating humanity from passwords. See https://www.mypico.org
 
-Pam_pico offers a pam module for authentication.
+pam-pico offers a pam module for authentication.
 
 ## Documentation
 
@@ -57,8 +57,11 @@ The dbus policy that allows the service to use the system bus can be found at:
 
 ## License
 
-pam_pico is released under the AGPL licence. Read COPYING for information.
+pam-pico is released under the AGPL licence. Read COPYING for information.
 
+## Contributing
+
+We welcome comments and contributions to the project. If you're interested in contributing please see here: https://get.mypico.org/cla/
 
 Contact and Links
 =================
