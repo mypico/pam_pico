@@ -1,0 +1,6 @@
+libpam-pico (0.0.0-1) unstable; urgency=medium
+
+  * Initial release (Closes: #2)
+
+ -- David Llewellyn-Jones <David.Llewellyn-Jones@cl.cam.ac.uk>  Tue, 06 Sep 2016 19:53:23 +0200
+
