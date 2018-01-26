@@ -17,9 +17,10 @@ You'll need to ensure you've installed the [build dependencies](https://docs.myp
 If you're using Ubuntu 16.04, you can install the remaining build dependencies using `apt`.
 
 ```
-sudo apt install autoconf autotools-dev libcurl4-openssl-dev libqrencode-dev check cmake libpam0g-dev gcovr \
-  libbluetooth-dev libsoup2.4-dev devscripts openssh-client git debhelper libtool pkg-config libssl-dev \
-  libglib2.0-dev dh-systemd libdbus-glib-1-dev libgtk-3-dev liburl-dispatcher1-dev doxygen graphviz
+sudo apt install autoconf autotools-dev libcurl4-openssl-dev libqrencode-dev check cmake \
+  libpam0g-dev gcovr libbluetooth-dev libsoup2.4-dev devscripts openssh-client git debhelper \
+  libtool pkg-config libssl-dev libglib2.0-dev dh-systemd libdbus-glib-1-dev libgtk-3-dev \
+  liburl-dispatcher1-dev doxygen graphviz
 ```
 
 Assuming you've got all these, download the latest version from the git repository and move inside the project folder.
