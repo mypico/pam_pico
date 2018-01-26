@@ -1,36 +1,45 @@
-# pam-pico ReadMe
+# pam_pico ReadMe
 
 The Pico project is liberating humanity from passwords. See https://www.mypico.org
 
-pam-pico offers a pam module for authentication.
+pam_pico offers a pam module for authentication.
 
 ## Documentation
 
-For more details on the pam_pico API, how to build the packages and so on, see:
+For more details on the pam_pico code and how to build the entire Pico stack, see the developer docs.
 
-https://docs.mypico.org/developer/pam_pico/
+https://docs.mypico.org/developer/
 
-## Install
+## Install from source
 
-Start by ensuring you've downloaded the latest version from the git repository and are inside the project folder.
+You'll need to ensure you've installed the [build dependencies](https://docs.mypico.org/developer/pam_pico/#deps) before you attempt to compile and install pam_pico. This includes building and installing libpicobt and libpico from the Pico repositories. See the [libpicobt](https://github.com/mypico/libpicobt) and the [libpico](https://github.com/mypico/libpico) repositories for instructions for this.
+
+If you're using Ubuntu 16.04, you can install the remaining build dependencies using `apt`.
+
 ```
-git clone git@github.com:mypico/android-pico.git
-cd android-pico
+sudo apt install autoconf autotools-dev libcurl4-openssl-dev libqrencode-dev check cmake libpam0g-dev gcovr libbluetooth-dev libsoup2.4-dev devscripts openssh-client git debhelper libtool pkg-config libssl-dev libglib2.0-dev dh-systemd libdbus-glib-1-dev libgtk-3-dev liburl-dispatcher1-dev doxygen graphviz
 ```
 
+Assuming you've got all these, download the latest version from the git repository and move inside the project folder.
 
+```
+git clone git@github.com:mypico/pam_pico.git
+cd pam_pico
+``
 
-
-If you have autoconf you should be able to install using the following 3 
-commands:
+You can now build using autoconf with the following commands:
 
 ```
 ./configure
 make
-make install
 ```
 
-However, we recommend you build the deb or rpm package instead. See the developer docs for details about how to do this.
+After this, the cleanest way to install it is to build the deb or rpm package and install that:
+
+```
+debuild -us -uc -b --lintian-opts -X changes-file
+sudo dpkg -i ../libpam-pico_0.0.2-1_amd64.deb
+```
 
 ## Continuous Authentication Service
 
@@ -66,7 +75,7 @@ The dbus policy that allows the service to use the system bus can be found at:
 
 ## License
 
-pam-pico is released under the AGPL licence. Read COPYING for information.
+pam_pico is released under the AGPL licence. Read COPYING for information.
 
 ## Contributing
 
