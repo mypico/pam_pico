@@ -28,7 +28,7 @@ Assuming you've got all these, download the latest version from the git reposito
 ```
 git clone git@github.com:mypico/pam_pico.git
 cd pam_pico
-``
+```
 
 You can now build using autoconf with the following commands:
 
