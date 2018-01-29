@@ -5,20 +5,6 @@
 
 <b>Version $(VERSION)</b>
 
-\subsection story A story
-
-The air was still damp from the rain and McCreedy felt the gravel crunch under his feet, lubricated by the puddles of water. He moved around the crime scene. He'd seen plenty of nasty murders before, but none of them quite so cold, so calculated, as what he was looking at right now.
-
-O'Neal, the pathologist on call that night, had covered the body in a sheet, hiding the worst of it. On the left-hand side of the body, just next to the dead man's shoulder, was a pot of green paint. On the right had side, at knee-height, the paint had been used to write the initials BMC on the ground. Just touching the man's fingers, a police-issue pistol.
-
-But this was no policeman. The gun didn't belong to the victim, and nor had the letters been written by him either. That part McCreedy had established as soon as he'd arrived at the scene, before O'Neal had done her work.
-
-Yes, this wasn't a man who'd scrawled a final, last note of accusation on the ground next to him. This was a man who'd fallen ten storeys from a building, landing on top of an accusation scrawled on the floor several hours before.
-
-"Inexplicable, don't you think?" O'Neal had sauntered up alongside. "How does a man fall ten storeys with his pockets full of eggs, but without breaking a single one?".
-
-McCreedy looked back at O'Neal thoughtfully. "Inexcusable? Yes. Inexplicable? Not at all." This was no inexplicable situation; McCreedy knew exactly what had happened. More to the point, he knew exactly who was responsible for murdering the man too. What he didn't yet know, and what he knew he had to find out, was how he was going to prove it.
-
 \subsection summary Summary
 
 This manual documents `pam_pico` version $(VERSION). `pam_pico` is a Pluggable Authentication Module (PAM) which, once installed and configured, allows you to log in to your computer using Pico.
@@ -28,10 +14,14 @@ This manual documents `pam_pico` version $(VERSION). `pam_pico` is a Pluggable A
 If you're a developer and are interested in conbtributing to the source code, the API documentation linked to above may be of interest. This gives an idea about what the different parts of the source code do.
 
 However, most people will just want to use the PAM as quickly as possible. If this is you, everything you need to know should be on this page.
- 
+
 \subsection linuxinstall Linux installation
 
-If you're running Ubuntu you can install `pam_pico` directly from the Pico PPA. Enter the following commands to add the PPA to your system:
+The installation instructions below assume you're using Ubuntu 16.04. It will build and run on other systems, but you'll need to adjust the instructions to suit your platform if you're using something else.
+
+\subsubsection linuxinstallbinrun Runtime binary installation
+
+If you're running Ubuntu 16.04 you can install `pam_pico` directly from the Pico PPA. Enter the following commands to add the PPA to your system:
 
 \verbatim
 sudo add-apt-repository ppa:mypico/ppa
@@ -44,64 +34,10 @@ Then install `pam_pico` using the following commands. As well as `pam_pico`, thi
 sudo apt install pam_pico
 \endverbatim
 
-If you don't want to add the Pico PPA, you can also download the latest package from the [Pico website](https:mypico.org). You'll need to install all of the dependencies yourself if you do it this way (see the @ref deps section). Then use the following to install `pam_pico`:
+If you don't want to add the Pico PPA, you can also download the latest package from the [Pico website](https:mypico.org). You'll need to install all of the dependencies yourself if you do it this way.
 
-\verbatim
-sudo dpkg -i libpam-pico_0.0.2-1_amd64.deb
-\endverbatim
-
-This will install the `pan_pico` PAM, the `pico-continuous` service and the `pico-pair` pairing tool.
-
-\subsection build Building from source
-
-Ensure you have all of the dependencies listed in \ref deps below. Then something along the following lines should do it.
-
-\verbatim
-git clone git@gitlab.dtg.cl.cam.ac.uk:pico/pam.git
-autoreconf --install
-./configure
-make
-\endverbatim
-
-To generate the DEB packages on a Debian-based system run something like the following:
-
-\verbatim
-debuild -us -uc -b --lintian-opts -X changes-file
-\endverbatim
-
-\subsubsection dicbuild Building the documentation
-
-The documentation you're reading now was generated using doxygen. If you want to generate it yourself you should get hold of the `pm_pico` source, then use the following commands to set things up.
-
-\verbatim
-autoreconf --install
-./configure
-\endverbatim
-
-You can now generate the documentation using
-
-\verbatim
-make doxygen
-\endverbatim
-
-You'll need various dependencies for this, including:
- - build-essentials
- - make
- - doxygen
- - libpico1
- - libpicobt
- - libqrencode
- - libssl
- - graphviz
-
-The html files will be generated and output to the docs folder.
-
-\subsection deps Dependencies
-
-On Linux libpico requires the following runtime dependencies (at least):
-
- - libpico-run, version 0.0.1 or later
  - libpicobt-run, version 0.0.1 or later
+ - libpico-run, version 0.0.1 or later
  - libssl, version 1.0.0 or later
  - libcurl3
  - libqrencode3
@@ -110,24 +46,83 @@ On Linux libpico requires the following runtime dependencies (at least):
  - liburl-dispatcher1
  - gksu
 
+See the [libpicobt](../libpicobt) documentation for how to install libpicobt-run, and see the [libpico](../libpico) documentation for how to install libpico-run. Apart from this, on Ubuntu 16.04 the remainder of these dependencies can be installed as follows.
+
+\verbatim
+sudo apt install libssl1.0.0 libcurl3 libqrencode3 libbluetooth3 libc6 liburl-dispatcher1 gksu
+\endverbatim
+
+Then use the following to install `pam_pico`:
+
+<pre class="fragment">
+sudo dpkg -i libpam-pico_$(VERSION)-1_amd64.deb
+</pre>
+
+This will install the `pan_pico` PAM, the `pico-continuous` service and the `pico-pair` pairing tool.
+
+\subsection build Building from source
+
 To build on Linux you'll need the following (at least):
- - libpicobt-dev, version 0.0.1 or later
+
  - libpicobt-run, version 0.0.1 or later
+ - libpicobt-dev, version 0.0.1 or later
+ - libpico-run, version 0.0.1 or later
+ - libpico-dev, version 0.0.1 or later
+ - libssl-dev
  - libcurl4-openssl-dev
  - libqrencode-dev
- - libssl-dev
  - libbluetooth-dev, version 4.91 or later
- - git
- - gcc
- - make
- - check
+ - liburl-dispatcher1-dev
  - pkg-config
  - autotools-dev
  - devscripts
  - debhelper
- - openssh-client
  - dh-systemd
- - liburl-dispatcher1-dev
+ - dh-exec
+ - git
+ - gcc
+ - make
+ - check
+ - openssh-client
+ - doxygen
+ - graphviz
+
+See the [libpicobt](../libpicobt) documentation for how to install libpicobt-run and libpicobt-dev, and see the [libpico](../libpico) documentation for how to install libpico-run and libpico-dev. Apart from this, on Ubuntu 16.04 the remainder of these dependencies can be installed as follows.
+
+\verbatim
+sudo apt install \
+  libssl-dev libcurl4-openssl-dev libqrencode-dev libbluetooth-dev liburl-dispatcher1-dev \
+  pkg-config autotools-dev devscripts debhelper dh-systemd dh-exec \
+  git gcc make check openssh-client doxygen graphviz
+\endverbatim
+
+Now grab yourself a copy of the code from the repository and compile it.
+
+\verbatim
+git clone git@github.com:mypico/pam_pico.git
+cd pam_pico
+./configure
+make
+make check
+\endverbatim
+
+The last command runs the unit tests, so isn't strictly required, but is useful for reassurance that everything built correctly. To generate the DEB packages on a Debian-based system run something like the following:
+
+\verbatim
+debuild -us -uc -b --lintian-opts -X changes-file
+\endverbatim
+
+This will build the pam_pico package and leave it in the parent directory. You can now install this package so it's ready for use on your system.
+
+<pre class="fragment">
+sudo dpkg -i ../libpam-pico_$(VERSION)-1_amd64.deb
+</pre>
+
+The documentation you're reading now was generated using doxygen. If you want to generate it yourself you do so as follows.
+
+\verbatim
+make doxygen
+\endverbatim
 
 \subsection logs Log files
 
@@ -288,6 +283,24 @@ gksu "pico-pair --gui --user $USER"
 In both cases, you'll also need to ensure your phone is *bluetooth paired* with your computer. Bluetooth pairing can be performed through the System Settings panel on Ubuntu, or through the <a href="https://help.ubuntu.com/stable/ubuntu-help/bluetooth-connect-device.html">Bluetooth icon on the menu bar</a>.
 
 Once you've configured `pam_pico`, paired using `pico-pair` and established a trusted Bluetooth pairing between your computer and your phone, you're ready to authenticate using Pico without the need for passwords.
+
+\subsection story A story
+
+The air was still damp from the rain and McCreedy felt the gravel crunch under his feet, lubricated by the puddles of water. He moved around the crime scene. He'd seen plenty of nasty murders before, but none of them quite so cold, so calculated, as what he was looking at right now.
+
+O'Neal, the pathologist on call that night, had covered the body in a sheet, hiding the worst of it. On the left-hand side of the body, just next to the dead man's shoulder, was a pot of green paint. On the right had side, at knee-height, the paint had been used to write the initials BMC on the ground. Just touching the man's fingers, a police-issue pistol.
+
+But this was no policeman. The gun didn't belong to the victim, and nor had the letters been written by him either. That part McCreedy had established as soon as he'd arrived at the scene, before O'Neal had done her work.
+
+Yes, this wasn't a man who'd scrawled a final, last note of accusation on the ground next to him. This was a man who'd fallen ten storeys from a building, landing on top of an accusation scrawled on the floor several hours before.
+
+"Inexplicable, don't you think?" O'Neal had sauntered up alongside. "How does a man fall ten storeys with his pockets full of eggs, but without breaking a single one?".
+
+McCreedy looked back at O'Neal thoughtfully. "Inexcusable? Yes. Inexplicable? Not at all." This was no inexplicable situation; McCreedy knew exactly what had happened. More to the point, he knew exactly who was responsible for murdering the man too. What he didn't yet know, and what he knew he had to find out, was how he was going to prove it.
+
+\subsection authors Authors
+
+The pam_pico code was created by the <a href="https://mypico.org">Pico Team</a>.
 
 */
 
