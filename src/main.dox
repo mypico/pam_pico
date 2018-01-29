@@ -130,9 +130,11 @@ All of the applications installed by `pam_pico` write logs using syslog. The def
 
 \subsection configure Configuring the system
 
-Once `pam_pico` package has been installed, you'll be forgiven for thinking that nothing has changed. That's because in order to make use of it, you'll also need to configure your PAM stack to call the new module. This involves adding a line to the configuration file for each application using the PAM stack, where you want Pico to be used instead of passwords. Each of these configuration files can be found in '/etc/pam.d'.
+Once the `pam_pico` package has been installed, you'll be forgiven for thinking that nothing has changed. That's because in order to make use of it, you'll also need to configure your PAM stack to call the new module. This involves adding a line to the configuration file for each application using the PAM stack, where you want Pico to be used instead of passwords. Each of these configuration files can be found in `/etc/pam.d`.
 
 The instructions in the \ref configure-pam section explains how to do this. You may also want to configure the `pico-continuous` service, as explained in section \ref configure-service, however this second step is optional.
+
+In theory you can use `pam_pico` with any of the applications that appear in the `/etc/pam.d` directory. We've tested it with unity, lightdm-greeter, gnome-screensave, ssh and sudo. However, we'd advise caution before using it with sudo, at least initially, since if something goes wrong you'll need a working sudo to fix it.
 
 \subsubsection configure-pam Configuring pam_pico
 
@@ -152,21 +154,21 @@ For each of the applications you want Pico to work with, you'll have to add
 Let's consider an example. Suppose you want to add Pico functionality to unity.
 Open the `unity` file in a text editor. You should see something like this:
 
-```
+\verbatim
 @include common-auth
 auth optional pam_gnome_keyring.so
-```
+\endverbatim
 
 That's a fairly basic PAM config file (the actual hard work is going on inside
 the `common-auth` file that's included in this one).
 
-To add Pico functionality, you'd need to add a new line to the top of the file
-like this.
-```
-auth    requisite /usr/lib/x86_64-linux-gnu/security/pam_pico.so bluetooth any_user no_input colorless_utf8 continuous
-@include common-auth
+To add Pico functionality, you'd need to add a new line to the top of the file, as well as commenting out the `@include` line, like this.
+
+\verbatim
+auth    required /usr/lib/x86_64-linux-gnu/security/pam_pico.so beacons=1 anyuser=1 input=0 qrtype=none channeltype=btc continuous=1 timeout=0
+#@include common-auth
 auth optional pam_gnome_keyring.so
-```
+\endverbatim
 
 As you can see we've added an `auth` line. Here's what the various parts of this additional line
 mean:
@@ -177,86 +179,99 @@ mean:
  3. `/usr/lib/x86_64-linux-gnu/security/pam_pico.so` is a reference to the
  `pam_pico` module. This means the task of authentication will be handled
  by this module.
- 4. `bluetooth any_user no_input colorless_utf8 continuous` are arguments
- passed to the `pam_pico` module. These are briefly described below.
+ 4. `beacons=1 anyuser=1 input=0 qrtype=none channeltype=btc continuous=1 timeout=0`
+ are arguments passed to the `pam_pico` module. These are briefly described below.
 
 The arguments that can be added to the end of the line are the following. Some of these can also be added to the service configuration file (see the {@link configure-service} section), but values added as arguments as shown here override those in the configuration file.
 
- - `json`:
+ - `channeltype=`
 
-   Output the code as a JSON string.
+   This can be set to either `rvp` or `btc`; for example `channeltype=btc`. This sets the channel to use for authentication. The parameters represent an HTTP(S) rendezvous point channel, or a Bluetooth Classic channel respectively.
 
- - `colorless_utf8`:
+ - `continuous=`
 
-    Output the code as a QR code in colourless UTF8 format, which renders four pixels per character.. The default format similarly uses UTF8, but includes  character sequences to control the colour.  This flag uses the same characters, but without the colour control sequences.
+   This can be set to either `0` or `1`, for example `continuous=1``. When set to `1`, continuous authentication will be performed. This means that Pico will continue periodic authentications with the pico-continuous service. If authentication fails for whatever reason (for example, the Pico moves out of Bluetooth range) then a signal will be made to lock the session.
 
- - `ansi`:
+ - `beacons=`
 
-   Output the code as a QR code in ANSI format. Each QR code pixel is rendered  as two horizontally aligned characters.  Consequently this will result in a rather large image being produced.
+   This can be set to either `0` or `1`, for example `beacons=1``. When set to `1`, beacons will be sent to nearby Picos using Bluetooth classic, notifying them that they can attempt authentication. This is an alternative to scanning the QR code. This is most useful when the channel is set to be Bluetooth, but will also work for a rendezvous point channel.
 
- - `tt_tag`:
+ - `anyuser=`
 
-   Render the QR code in UTF8 format, but include `&lt;tt&gt;` tags to ensure the QR  code is rendered in a fixed with font.
+   This can be set to either `0` or `1`, for example `anyuser=1`. The module can either authenticate a specific user (passed through a PAM variable), or it can determine the user to authenticate based on the key used by the Pico. A simple way to appreciate the distinction is to consider the difference between the login process and the unlock process. In the former case, any user can log in and the correct session will be loaded for that user. In the latter case, only the user with the locked session is entitled to unlock it. Setting this flag to `1` will allow any user to authenticate against the module. It's important to get this right, since otherwise you may find any user can unlock a particular user's locked session.
 
- - `no_input`:
+ - `qrtype=`
 
-   Set this flag to prevent the module requesting user input. Depending on the PAM client implementation, input may be required to ensure  the  Pico  response  is collected.   In  other  implementations,  asking  for a response will block the authentication from proceeding until the user has hit the enter key.  This flag allows  the  input  request to be controlled to take account of these different implementation specifics.
+   Set the style of output to use for the displayed QR code. Possible values are: `json` to return a JSON string rather than a QR code; `color_utf8` for compact output that will work on a colour-enabled UTF8 terminal; `colorless_utf8` for compact output that will display in black and white on a UTF8 terminal; `ansi` for black and white output, two characters per pizel; `tt_tag` which produdes the same output as colorless_utf8, but surrounded by &lt;tt&gt; tags; `none` to display no output at all. For example `qrtype=color_utf8`.
 
- - `any_user`:
+ - `input=`
 
-   The module can either authenticate a specific user (passed through a PAM  variable),  or  it  can determine the user to authenticate based on the key used by the Pico.  A simple way to appreciate this difference is to consider  the  difference  between the login process and the unlock process.  In the former case, any user can log in and the correct session will be loaded for that  user.   In the  latter  case,  only the user with the locked session is entitled to unlock it.  Setting this flag will allow any user to authenticate against the module.
+   This can be set to either `0` or `1`, for example `input=1``. When set to `1`, the module will request user input; when set to `0` it will not request any input. Depending on the PAM client implementation, input may be required to ensure the Pico response is collected. (e.g. ssh) In other implementations, asking for a response will block the authentication from proceeding until the user has hit the enter key. This flag allows the input request to be controlled to take account of these different implementation specifics.
 
- - `bluetooth`:
+ - `timeout=`
 
-   This flag will set the channel for authentication to  be  Bluetooth.   If  this flag is omitted, HTTP/HTTPS will be used instead, via the Rendezvous Point.
+   This takes an integer value, for example `timeout=40`. This sets the length of time in seconds `pam_pico` will block until it decides that no Pico is going to authenticate to it. If this time limit is reached, it will return, indicating that authentication failed. A value of 0 indicates that there should be no timeout: `pam_pico` will block indefinitely.
 
- - `no_msg`:
+ - `rvpurl=`
 
-   When set, output of the code will be suppressed entirely.
+   This takes a string representing a URL, for example `rvpurl=https://rendezvous.mypico.org`. This URL is used for the address of the rendezvous point. This parameter is only used if `channeltype=rvp` is also set.
 
- - `continuous`:
+ - `configdir=`
 
-   When set, continuous authentication will be performed. This means that the Pico will continue periodic authentications with the pico-continuous(8) service.  If authentication  fails  for  whatever reason (for example, the Pico moves out of Bluetooth range) then a signal will be made to lock the session.
+   This takes a string representing a directory path, for example `configdir=/etc/pam_pico`. This directory will be used as the location from which to load in the configuration file, the service's public/private key, the user list and the list of Bluetooth devices to beacon.
 
 \subsubsection configure-service Configuring pico-continuous
 
 The `pico-continuous` service is run as a systemd daemon. It can be controlled using the `systemctl` command. For example:
 
-```
+\verbatim
 systemctl status pico-continuous.service
-```
+\endverbatim
+
 Once installed the service is configured to run at start up and stay running continuously until the system is shut down. In order to use Pico, you should leave the service running.
 
-Many of the configuration options that can be passed as arguments to `pam_pico` are actually passed directly on to the `pico-continuous` service, which performs the actual authentication with your Pico. Rather than add these options to the command line, they can also be configured in the `config.txt` configuration file found in the `/etc/pam-pico` directory.
+Many of the configuration options that can be passed as arguments to `pam_pico` are actually passed directly on to the `pico-continuous` service, which performs the actual authentication with your Pico. Rather than add these options to the command line, they can also be configured in the `config.txt` configuration file. This file is found by default in the `/etc/pam-pico` directory, but its location can also be configured by adding a `configdir=` parameter as an argument to `pam_pico` (see above).
 
 The `config.txt` file is optional, but if it does exist it must be formatted as a <a href="http://json.org/">JSON</a> file. Below are the possible key-value pairs allowed in this file.
 
- - `continuous`
-
-   This can take a value of either 0 or 1, and prescribes whether continuous authentication should be used or not. Use 1 to use continuous authentication, 0 otherwise. Note that setting this value to 1 will currently force the channel to use Bluetooth. The default value is 0.
-
  - `channeltype`
 
-    This can take a value of either `rvp` or `bluetooth`. The former will use HTTP as the authentication channel, routed via a rendezvous point. The latter will use Bluetooth for the authentication channel. In either case the channel is considered untrusted, which means Pico provides its own confidential and authentic channel on top of the method used. The default value is `rvp`.
+    This can take a value of either `rvp` or `btc`. The former will use HTTP(S) as the authentication channel, routed via a rendezvous point. The latter will use Bluetooth Classic for the authentication channel. In either case the channel is considered untrusted, which means Pico provides its own confidential and authentic channel on top of the method used. The default value is `rvp`.
     
+ - `continuous`
+
+   This can take a value of either 0 or 1, and prescribes whether continuous authentication should be used or not. Use 1 to use continuous authentication, 0 otherwise. The default value is 0.
+
  - `beacons`
 
-   This can take a value of either 0 or 1, and prescribes whether Bluetooth beacons are sent out advertising to nearby Picos. A nearby Pico that hears the beacon and is paired with the device will offer to the user to authenticate, or potentially authenticate automatically depending on how the Pico app is configured. The default value is 0.
+   This can take a value of either 0 or 1, and prescribes whether Bluetooth Classic beacons are sent out advertising to nearby Picos. A nearby Pico that hears the beacon and is paired with the device will offer to the user to authenticate, or potentially authenticate automatically depending on how the Pico app is configured. The default value is 0.
 
  - `anyuser`
 
    This can take a value of either 0 or 1. If set to 0, `pam_pico` will expect a specific user to log in. This reflects the case where a user has locked their machine, so only they are entitled to unlock it. If this is set to 1, any user paired with the system can authenticate. This reflects the case of a login screen, where any user with an account is entitled to log in. The default value is 0.
 
+ - `timeout`
 
-Not all options need to be included in the file. If they're not the default is used. However, note that any of the values in the `config.txt` will  be overriden by any values specified as arguments to the PAM. An example `config.txt` file might look something like the following.
+   This takes an integer value and sets the length of time in seconds `pam_pico` will block until it decides that no Pico is going to authenticate to it. If this time limit is reached, it will return, indicating that authentication failed. A value of 0 indicates that there should be no timeout: `pam_pico` will block indefinitely.
 
-```
+ - `rvpurl`
+
+   This takes a string representing a URL. This URL is used for the address of the rendezvous point. This parameter is only used if a Rendezvous Point channel is being used.
+
+ - `configdir`
+
+   This takes a string representing a directory path. This directory will be used as the location from which to load in the configuration file, the service's public/private key, the user list and the list of Bluetooth devices to beacon.
+
+Not all options need to be included in the file. If they're not the default is used. However, note also that any of the values in the `config.txt` will be overriden by any values specified as arguments to the PAM. An example `config.txt` file might look something like the following.
+
+\verbatin
 {
   "continuous"  : 1,
-  "channeltype" : "bluetooth",
-  "beacons"     : 1
+  "channeltype" : "btc",
+  "beacons"     : 1,
+  "rvpurl"      : "https://rendezvous.mypico.org"
 }
-```
+\endverbatin
 
 For more information about the `pico-continuous` service you can also refer to its man page.
 
@@ -268,23 +283,25 @@ Pairing is performed using the `pico-pair` application. The application has to r
 
 To use the default terminal interface you can use the following command:
 
-```
+\verbatim
 sudo pico-pair --user $USER
-```
+\endverbatim
 
 This will ask you to enter your user password, before displaying a QR code on the terminal that you'll need to scan with your Pico app.
 
 The GUI version walks you through the process a little more gently. This can be started by entering `pico-pair` on the Unity dash, or by entering the following command at the terminal.
 
-```
+\verbatim
 gksu "pico-pair --gui --user $USER"
-```
+\endverbatim
 
 In both cases, you'll also need to ensure your phone is *bluetooth paired* with your computer. Bluetooth pairing can be performed through the System Settings panel on Ubuntu, or through the <a href="https://help.ubuntu.com/stable/ubuntu-help/bluetooth-connect-device.html">Bluetooth icon on the menu bar</a>.
 
 Once you've configured `pam_pico`, paired using `pico-pair` and established a trusted Bluetooth pairing between your computer and your phone, you're ready to authenticate using Pico without the need for passwords.
 
 \subsection story A story
+
+<em>[If you've got this far, you deserve something a little different.]</em>
 
 The air was still damp from the rain and McCreedy felt the gravel crunch under his feet, lubricated by the puddles of water. He moved around the crime scene. He'd seen plenty of nasty murders before, but none of them quite so cold, so calculated, as what he was looking at right now.
 
