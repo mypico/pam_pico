@@ -55,61 +55,90 @@ QR code, or for it to be broadcast to the Pico as a Bluetooth beacon.
 .SH OPTIONS
 A summary of options is included below.
 .TP
-.B json
-Output the code as a JSON string.
+.B channeltype=
+Can be set to either
+.B rvp
+or
+.BR btc ;
+for example
+.BR channeltype=btc .
+This sets the channel to use for authentication. The parameters
+represent an HTTP(S) rendezvous point channel, or a Bluetooth Classic
+channel respectively.
 .TP
-.B colorless_utf8
-Output the code as a QR code in colourless UTF8 format, which renders 
-four pixels per character.. The default format similarly uses UTF8, but 
-includes character sequences to control the colour. 
-This flag uses the same characters, but without the colour control 
-sequences.
-.TP
-.B ansi
-Output the code as a QR code in ANSI format. Each QR code pixel is 
-rendered as two horizontally aligned characters.
-Consequently this will result in a rather large image being produced.
-.TP
-.B tt_tag
-Render the QR code in UTF8 format, but include \<tt\> tags to ensure the 
-QR code is rendered in a fixed with font.
-.TP
-.B no_input
-Set this flag to prevent the module requesting user input. Depending on
-the PAM client implementation, input may be required to ensure the 
-Pico response is collected. 
-In other implementations, asking for a response will block the 
-authentication from proceeding until the user has hit the enter key. 
-This flag allows the input request to be controlled to take account of 
-these different implementation specifics.
-.TP
-.B any_user
-The module can either authenticate a specific user (passed through a PAM 
-variable), or it can determine the user to authenticate based on the 
-key used by the Pico.
-A simple way to appreciate this difference is to consider the difference 
-between the login process and the unlock process. 
-In the former case, any user can log in and the correct session will be 
-loaded for that user. 
-In the latter case, only the user with the locked session is entitled 
-to unlock it.
-Setting this flag will allow any user to authenticate against the module.
-.TP
-.B bluetooth
-This flag will set the channel for authentication to be Bluetooth. 
-If this flag is omitted, HTTP/HTTPS will be used instead, via the
-Rendezvous Point.
-.TP
-.B no_msg
-When set, output of the code will be suppressed entirely.
-.TP
-.B continuous
-When set, continuous authentication will be performed. This means that 
-the Pico will continue periodic authentications with the
-.BR pico-continuous (8) 
-service. 
-If authentication fails for whatever reason (for example, the Pico moves 
+.B continuous=
+Can be set to either
+.B 0
+or
+.BR 1,
+for example
+.BR continuous=1 .
+When set to 1, continuous authentication will be performed. This means that Pico
+will continue periodic authentications with the pico-continuous service.
+If authentication fails for whatever reason (for example, the Pico moves
 out of Bluetooth range) then a signal will be made to lock the session.
+.TP
+.B beacons=
+Can be set to either
+.B 0
+or
+.BR 1 ,
+for example
+.BR beacons=1 .
+When set to 1, beacons will be sent to nearby Picos using Bluetooth classic, notifying them that they can attempt authentication. This is an alternative to scanning the QR code. This is most useful when the channel is set to be Bluetooth, but will also work for a rendezvous point channel.
+.TP
+.B anyuser=
+Can be set to either
+.B 0
+or
+.BR 1 ,
+for example
+.BR anyuser=1 .
+The module can either authenticate a specific user (passed through a PAM variable), or it can determine the user to authenticate based on the key used by the Pico. A simple way to appreciate the distinction is to consider the difference between the login process and the unlock process. In the former case, any user can log in and the correct session will be loaded for that user. In the latter case, only the user with the locked session is entitled to unlock it. Setting this flag to 1 will allow any user to authenticate against the module. It's important to get this right, since otherwise you may find any user can unlock a particular user's locked session.
+.TP
+.B qrtype=
+Set the style of output to use for the displayed QR code. Possible values are:
+.B json
+to return a JSON string rather than a QR code;
+.B color_utf8
+for compact output that will work on a colour-enabled UTF8 terminal;
+.B colorless_utf8
+for compact output that will display in black and white on a UTF8 terminal;
+.B ansi
+for black and white output, two characters per pizel;
+.B tt_tag
+which produdes the same output as colorless_utf8, but surrounded by <tt>; tags;
+.B none
+to display no output at all. For example
+.BR qrtype=color_utf8 .
+.TP
+.B input=
+Can be set to either
+.B 0
+or
+.BR 1 ,
+for example
+.BR input=1 .
+When set to 1, the module will request user input; when set to 0 it will not request any input. Depending on the PAM client implementation, input may be required to ensure the Pico response is collected. (e.g. ssh) In other implementations, asking for a response will block the authentication from proceeding until the user has hit the enter key. This flag allows the input request to be controlled to take account of these different implementation specifics.
+.TP
+.B timeout=
+This takes an integer value, for example
+.BR timeout=40 .
+This sets the length of time in seconds pam_pico will block until it decides that no Pico is going to authenticate to it. If this time limit is reached, it will return, indicating that authentication failed. A value of 0 indicates that there should be no timeout: pam_pico will block indefinitely.
+.TP
+.B rvpurl=
+This takes a string representing a URL, for example
+.BR rvpurl=https://rendezvous.mypico.org .
+This URL is used for the address of the rendezvous point. This parameter is only used if channeltype=rvp is also set.
+.TP
+.B configdir=
+This takes a string representing a directory path, for example
+.BR configdir=/etc/pam_pico .
+This directory will be used as the location from which to load in the configuration file, the service's public/private key, the user list and the list of Bluetooth devices to beacon.
+.PP
+These optionos can also be stored in JSON format in the config file, in which case they'll be read by the
+.BR pico-continuous (8) 
+service. Options passed as parameters take priority over those found in the config file.
 .SH SEE ALSO
 .BR pico-continuous (8),
 .BR pico-pair (8),
