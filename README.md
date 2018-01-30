@@ -10,6 +10,10 @@ For more details on the pam_pico code and how to build the entire Pico stack, se
 
 https://docs.mypico.org/developer/
 
+If you want to build all the Pico components from source in one go, without having to worry about the details, see:
+
+https://github.com/mypico/pico-build-all
+
 ## Install from source
 
 You'll need to ensure you've installed the [build dependencies](https://docs.mypico.org/developer/pam_pico/#deps) before you attempt to compile and install pam_pico. This includes building and installing libpicobt and libpico from the Pico repositories. See the [libpicobt](https://github.com/mypico/libpicobt) and the [libpico](https://github.com/mypico/libpico) repositories for instructions for this.
