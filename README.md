@@ -23,9 +23,9 @@ If you're using Ubuntu 16.04, you can install the remaining build dependencies u
 ```
 sudo apt install \
   libssl-dev libcurl4-openssl-dev libqrencode-dev libbluetooth-dev liburl-dispatcher1-dev libc6 \
-  libsoup2.4-dev libglib2.0-dev libdbus-glib-1-dev libgtk-3-dev libpam0g-dev gconv gksu \
+  libsoup2.4-dev libglib2.0-dev libdbus-glib-1-dev libgtk-3-dev libpam0g-dev gksu \
   autoconf pkg-config autotools-dev devscripts debhelper dh-systemd dh-exec build-essential \
-  git gcc make check openssh-client libtooldoxygen graphviz
+  git gcc make check openssh-client libtool doxygen graphviz
 ```
 
 Assuming you've got all these, download the latest version from the git repository and move inside the project folder.
