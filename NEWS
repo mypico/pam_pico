@@ -1,3 +1,18 @@
+pam_pico-0.0.3-1: 19-Jan-2018
+  - Reduce to using a single thread and GtkMainLoop.
+  - Use state machine rather than blocking sigmaverifier.
+  - Improve command line parameter options.
+  - Support RVP and Bluetooth beacons.
+  - Support RVP and continuous.
+  - Allow PAM athentication without a timeout.
+  - Generally optimised performance.
+  - Support configuration by file.
+  - Allow multiple configurations on the same device.
+  - Improved documentation.
+  - Support encrypted password storage on the Pico.
+  - Add working machine lock.
+  - Allow only a single continuous session with same commitment.
+
 pam_pico-0.0.2-1: 11-Jul-2017
   - Support continuous authentication
   - Add bluez dependency.

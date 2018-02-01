@@ -1,5 +1,5 @@
 AC_PREREQ(2.61)
-AC_INIT([pam-pico], [0.0.2], [Frank.Stajano@cl.cam.ac.uk, David.Llewellyn-Jones@cl.cam.ac.uk])
+AC_INIT([pam-pico], [0.0.3], [Frank.Stajano@cl.cam.ac.uk, David.Llewellyn-Jones@cl.cam.ac.uk])
 AC_CONFIG_SRCDIR([src/pam_pico.c])
 AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build])
