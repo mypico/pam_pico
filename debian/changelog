@@ -1,3 +1,21 @@
+libpam-pico (0.0.3-1) unstable; urgency=medium
+
+  * Reduce to using a single thread and GtkMainLoop.
+  * Use state machine rather than blocking sigmaverifier.
+  * Improve command line parameter options.
+  * Support RVP and Bluetooth beacons.
+  * Support RVP and continuous.
+  * Allow PAM athentication without a timeout.
+  * Generally optimised performance.
+  * Support configuration by file.
+  * Allow multiple configurations on the same device.
+  * Improved documentation.
+  * Support encrypted password storage on the Pico.
+  * Add working machine lock.
+  * Allow only a single continuous session with same commitment.
+
+ -- David Llewellyn-Jones <David.Llewellyn-Jones@cl.cam.ac.uk>  Fri, 19 Jan 2018 14:45:11 +0000
+
 libpam-pico (0.0.2-1) unstable; urgency=medium
 
   * Add bluez dependency.
