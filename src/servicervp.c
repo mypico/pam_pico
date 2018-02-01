@@ -371,7 +371,7 @@ void servicervp_start(ServiceRvp * servicervp, Shared * shared, Users const * us
 			beaconthread_set_finished_callback(servicervp->service.beaconthread, servicervp_beaconthread_finish, servicervp);
 
 			LOG(LOG_INFO, "Starting beacons");
-			beaconthread_start(servicervp->service.beaconthread);
+			beaconthread_start(servicervp->service.beaconthread, users);
 		}
 
 		fsmservice_start(servicervp->service.fsmservice, shared, users, extraData);

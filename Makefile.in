@@ -92,7 +92,8 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = pico-pair$(EXEEXT) pico-continuous$(EXEEXT) \
 	pico-test$(EXEEXT)
-TESTS = tests/test_pam$(EXEEXT) tests/test_auth$(EXEEXT)
+TESTS = tests/test_pam$(EXEEXT) tests/test_auth$(EXEEXT) \
+	tests/test_beacons$(EXEEXT)
 check_PROGRAMS = $(am__EXEEXT_1)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -197,7 +198,8 @@ pam_pico_la_OBJECTS = $(am_pam_pico_la_OBJECTS)
 pam_pico_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(pam_pico_la_CFLAGS) \
 	$(CFLAGS) $(pam_pico_la_LDFLAGS) $(LDFLAGS) -o $@
-am__EXEEXT_1 = tests/test_pam$(EXEEXT) tests/test_auth$(EXEEXT)
+am__EXEEXT_1 = tests/test_pam$(EXEEXT) tests/test_auth$(EXEEXT) \
+	tests/test_beacons$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 am_pico_continuous_OBJECTS =  \
 	src/pico_continuous-pico-continuous.$(OBJEXT) \
@@ -238,6 +240,15 @@ tests_test_auth_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(tests_test_auth_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
+tests_test_beacons_SOURCES = tests/test_beacons.c
+tests_test_beacons_OBJECTS =  \
+	tests/tests_test_beacons-test_beacons.$(OBJEXT)
+tests_test_beacons_DEPENDENCIES = .libs/lib_service_test.la \
+	.libs/lib_mockpam.la .libs/lib_mockbt.la .libs/lib_mockdbus.la
+tests_test_beacons_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(tests_test_beacons_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
 tests_test_pam_SOURCES = tests/test_pam.c
 tests_test_pam_OBJECTS = tests/tests_test_pam-test_pam.$(OBJEXT)
 tests_test_pam_DEPENDENCIES = .libs/lib_pam_test.la \
@@ -284,12 +295,14 @@ SOURCES = $(lib_mockbt_la_SOURCES) $(lib_mockdbus_la_SOURCES) \
 	$(lib_mockpam_la_SOURCES) $(lib_pam_test_la_SOURCES) \
 	$(lib_service_test_la_SOURCES) $(pam_pico_la_SOURCES) \
 	$(pico_continuous_SOURCES) $(pico_pair_SOURCES) \
-	$(pico_test_SOURCES) tests/test_auth.c tests/test_pam.c
+	$(pico_test_SOURCES) tests/test_auth.c tests/test_beacons.c \
+	tests/test_pam.c
 DIST_SOURCES = $(lib_mockbt_la_SOURCES) $(lib_mockdbus_la_SOURCES) \
 	$(lib_mockpam_la_SOURCES) $(lib_pam_test_la_SOURCES) \
 	$(lib_service_test_la_SOURCES) $(pam_pico_la_SOURCES) \
 	$(pico_continuous_SOURCES) $(pico_pair_SOURCES) \
-	$(pico_test_SOURCES) tests/test_auth.c tests/test_pam.c
+	$(pico_test_SOURCES) tests/test_auth.c tests/test_beacons.c \
+	tests/test_pam.c
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -818,6 +831,8 @@ tests_test_pam_CFLAGS = $(AM_CFLAGS) @PICO_CFLAGS@ @CHECK_CFLAGS@ @PICOBT_CFLAGS
 tests_test_pam_LDADD = .libs/lib_pam_test.la .libs/lib_mockpam.la .libs/lib_mockbt.la .libs/lib_mockdbus.la @CHECK_LIBS@ @PICO_LIBS@
 tests_test_auth_CFLAGS = $(AM_CFLAGS) @PICO_CFLAGS@ @CHECK_CFLAGS@ @PICOBT_CFLAGS@ @DBUSGLIB_CFLAGS@ @GLIB_CFLAGS@
 tests_test_auth_LDADD = .libs/lib_pam_test.la .libs/lib_mockpam.la .libs/lib_mockbt.la .libs/lib_mockdbus.la @CHECK_LIBS@ @PICO_LIBS@
+tests_test_beacons_CFLAGS = $(AM_CFLAGS) @PICO_CFLAGS@ @CHECK_CFLAGS@ @PICOBT_CFLAGS@ @DBUSGLIB_CFLAGS@ @GLIB_CFLAGS@
+tests_test_beacons_LDADD = .libs/lib_service_test.la .libs/lib_mockpam.la .libs/lib_mockbt.la .libs/lib_mockdbus.la @CHECK_LIBS@ @PICO_LIBS@
 
 #check_PROGRAMS    = examples/demo tests/pam_google_authenticator_unittest
 #check_LTLIBRARIES = libpam_google_authenticator_testing.la
@@ -1122,6 +1137,12 @@ tests/tests_test_auth-test_auth.$(OBJEXT): tests/$(am__dirstamp) \
 tests/test_auth$(EXEEXT): $(tests_test_auth_OBJECTS) $(tests_test_auth_DEPENDENCIES) $(EXTRA_tests_test_auth_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/test_auth$(EXEEXT)
 	$(AM_V_CCLD)$(tests_test_auth_LINK) $(tests_test_auth_OBJECTS) $(tests_test_auth_LDADD) $(LIBS)
+tests/tests_test_beacons-test_beacons.$(OBJEXT):  \
+	tests/$(am__dirstamp) tests/$(DEPDIR)/$(am__dirstamp)
+
+tests/test_beacons$(EXEEXT): $(tests_test_beacons_OBJECTS) $(tests_test_beacons_DEPENDENCIES) $(EXTRA_tests_test_beacons_DEPENDENCIES) tests/$(am__dirstamp)
+	@rm -f tests/test_beacons$(EXEEXT)
+	$(AM_V_CCLD)$(tests_test_beacons_LINK) $(tests_test_beacons_OBJECTS) $(tests_test_beacons_LDADD) $(LIBS)
 tests/tests_test_pam-test_pam.$(OBJEXT): tests/$(am__dirstamp) \
 	tests/$(DEPDIR)/$(am__dirstamp)
 
@@ -1170,6 +1191,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_pair-pico-pair.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_test-pico-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/tests_test_auth-test_auth.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/tests_test_beacons-test_beacons.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/tests_test_pam-test_pam.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/mockbt/$(DEPDIR)/lib_mockbt_la-mockbt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/mockdbus/$(DEPDIR)/lib_mockdbus_la-mockdbus.Plo@am__quote@
@@ -1486,6 +1508,20 @@ tests/tests_test_auth-test_auth.obj: tests/test_auth.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tests_test_auth_CFLAGS) $(CFLAGS) -c -o tests/tests_test_auth-test_auth.obj `if test -f 'tests/test_auth.c'; then $(CYGPATH_W) 'tests/test_auth.c'; else $(CYGPATH_W) '$(srcdir)/tests/test_auth.c'; fi`
 
+tests/tests_test_beacons-test_beacons.o: tests/test_beacons.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tests_test_beacons_CFLAGS) $(CFLAGS) -MT tests/tests_test_beacons-test_beacons.o -MD -MP -MF tests/$(DEPDIR)/tests_test_beacons-test_beacons.Tpo -c -o tests/tests_test_beacons-test_beacons.o `test -f 'tests/test_beacons.c' || echo '$(srcdir)/'`tests/test_beacons.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) tests/$(DEPDIR)/tests_test_beacons-test_beacons.Tpo tests/$(DEPDIR)/tests_test_beacons-test_beacons.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/test_beacons.c' object='tests/tests_test_beacons-test_beacons.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tests_test_beacons_CFLAGS) $(CFLAGS) -c -o tests/tests_test_beacons-test_beacons.o `test -f 'tests/test_beacons.c' || echo '$(srcdir)/'`tests/test_beacons.c
+
+tests/tests_test_beacons-test_beacons.obj: tests/test_beacons.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tests_test_beacons_CFLAGS) $(CFLAGS) -MT tests/tests_test_beacons-test_beacons.obj -MD -MP -MF tests/$(DEPDIR)/tests_test_beacons-test_beacons.Tpo -c -o tests/tests_test_beacons-test_beacons.obj `if test -f 'tests/test_beacons.c'; then $(CYGPATH_W) 'tests/test_beacons.c'; else $(CYGPATH_W) '$(srcdir)/tests/test_beacons.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) tests/$(DEPDIR)/tests_test_beacons-test_beacons.Tpo tests/$(DEPDIR)/tests_test_beacons-test_beacons.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tests/test_beacons.c' object='tests/tests_test_beacons-test_beacons.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tests_test_beacons_CFLAGS) $(CFLAGS) -c -o tests/tests_test_beacons-test_beacons.obj `if test -f 'tests/test_beacons.c'; then $(CYGPATH_W) 'tests/test_beacons.c'; else $(CYGPATH_W) '$(srcdir)/tests/test_beacons.c'; fi`
+
 tests/tests_test_pam-test_pam.o: tests/test_pam.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tests_test_pam_CFLAGS) $(CFLAGS) -MT tests/tests_test_pam-test_pam.o -MD -MP -MF tests/$(DEPDIR)/tests_test_pam-test_pam.Tpo -c -o tests/tests_test_pam-test_pam.o `test -f 'tests/test_pam.c' || echo '$(srcdir)/'`tests/test_pam.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) tests/$(DEPDIR)/tests_test_pam-test_pam.Tpo tests/$(DEPDIR)/tests_test_pam-test_pam.Po
@@ -1792,6 +1828,13 @@ tests/test_pam.log: tests/test_pam$(EXEEXT)
 tests/test_auth.log: tests/test_auth$(EXEEXT)
 	@p='tests/test_auth$(EXEEXT)'; \
 	b='tests/test_auth'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+tests/test_beacons.log: tests/test_beacons$(EXEEXT)
+	@p='tests/test_beacons$(EXEEXT)'; \
+	b='tests/test_beacons'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

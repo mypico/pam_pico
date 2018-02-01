@@ -298,7 +298,7 @@ void servicebtc_start(ServiceBtc * servicebtc, Shared * shared, Users const * us
 			beaconthread_set_finished_callback(servicebtc->service.beaconthread, servicebtc_beaconthread_finish, servicebtc);
 
 			LOG(LOG_INFO, "Starting beacons");
-			beaconthread_start(servicebtc->service.beaconthread);
+			beaconthread_start(servicebtc->service.beaconthread, users);
 		}
 
 		fsmservice_start(servicebtc->service.fsmservice, shared, users, extraData);

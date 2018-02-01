@@ -126,7 +126,7 @@ lib_mockdbus_la_SOURCES = \
 lib_mockdbus_la_CFLAGS  = $(AM_CFLAGS) @DBUSGLIB_CFLAGS@
 
 # Tests
-TESTS = tests/test_pam tests/test_auth #tests/test_service
+TESTS = tests/test_pam tests/test_auth tests/test_beacons #tests/test_service
 
 check_PROGRAMS = $(TESTS)
 
@@ -135,6 +135,9 @@ tests_test_pam_LDADD = .libs/lib_pam_test.la .libs/lib_mockpam.la .libs/lib_mock
 
 tests_test_auth_CFLAGS = $(AM_CFLAGS) @PICO_CFLAGS@ @CHECK_CFLAGS@ @PICOBT_CFLAGS@ @DBUSGLIB_CFLAGS@ @GLIB_CFLAGS@
 tests_test_auth_LDADD = .libs/lib_pam_test.la .libs/lib_mockpam.la .libs/lib_mockbt.la .libs/lib_mockdbus.la @CHECK_LIBS@ @PICO_LIBS@
+
+tests_test_beacons_CFLAGS = $(AM_CFLAGS) @PICO_CFLAGS@ @CHECK_CFLAGS@ @PICOBT_CFLAGS@ @DBUSGLIB_CFLAGS@ @GLIB_CFLAGS@
+tests_test_beacons_LDADD = .libs/lib_service_test.la .libs/lib_mockpam.la .libs/lib_mockbt.la .libs/lib_mockdbus.la @CHECK_LIBS@ @PICO_LIBS@
 
 #tests_test_service_CFLAGS = $(AM_CFLAGS) @PICO_CFLAGS@ @CHECK_CFLAGS@ @GLIB_CFLAGS@
 #tests_test_service_LDADD = .libs/lib_service_test.la .libs/lib_mockbt.la @CHECK_LIBS@ @PICO_LIBS@ @GLIB_LIBS@
