@@ -57,66 +57,21 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <syslog.h>
-#include <picobt/bt.h>
-#include <picobt/btmain.h>
-#include "processstore.h"
+#include "pico/base64.h"
+#include "pico/cryptosupport.h"
+#include "pico/users.h"
+#include "pico/beacons.h"
 
+#include "processstore.h"
 #include "log.h"
 #include "beaconsend.h"
+
 #include "beaconthread.h"
 
 // Defines
 
 
-/**
- * @brief Maximum length of a Bluetooth MAC
- *
- * The MAC of each device to send beacons to is read in from file, each line
- * containing a single address. This is the maximum length of string that will
- * be read per line of the file.
- *
- * This assumes each MAC is represented as six two-digit hexadecimal numbers
- * separated by colons. Like this XX:XX:XX:XX:XX:XX where XX represents a
- * hexadecimal byte.
- *
- */
-#define DEVICES_LINE_MAX (19)
-
 // Structure definitions
-
-typedef struct _Devices Devices;
-typedef struct _Device Device;
-
-/**
- * @brief Data assocated with a single device beacons are sent to
- *
- * This data structure is used to keep track of all data required by
- * BeaconSend in order to send beacons to a specific, individual device.
- * The actual event chain that sends the data is managed by the
- * BeaconSend structure contained inside.
- *
- * The data forms a single-direction linked list. In practice we only ever
- * want to cycle through the full list, so a single linked list is appropriate.
- * The list is created once when the details are loaded from file, then deleted
- * at the end, so management of the list requires minimal functionality.
- */
-struct _Device {
-	char * device;
-	BeaconSend * beaconsend;
-	Device * next;
-};
-
-/**
- * @brief A header for the linked list of Device data structures
- *
- * A header that points to the first Device data structure in the linked list.
- * The header also keeps track of the number of items in the linked list.
- *
- */
-struct _Devices {
-	Device * first;
-	int num;
-};
 
 /**
  * @brief Opaque structure used for managing the beacon sending
@@ -134,7 +89,9 @@ struct _Devices {
 struct _BeaconThread {
 	Buffer * code;
 	BEACONTHREADSTATE state;
-	Devices * devices;
+	Beacons * beacons;
+	size_t beaconsendcount;
+	BeaconSend ** beaconsend;
 	int running;
 	BeaconThreadFinishCallback finish_callback;
 	void * user_data;
@@ -145,7 +102,6 @@ typedef struct _BeaconPool BeaconPool;
 
 // Function prototypes
 
-static void beaconthread_load_devices(BeaconThread * beaconthread, char const * filename);
 static void beaconthread_finished(BeaconSend const * beaconsend, void * user_data);
 
 // Function definitions
@@ -162,9 +118,9 @@ BeaconThread * beaconthread_new() {
 
 	beaconthread->state = BEACONTHREADSTATE_INVALID;
 	beaconthread->code = buffer_new(0);
-	beaconthread->devices = CALLOC(sizeof(Devices), 1);
-	beaconthread->devices->num = 0;
-	beaconthread->devices->first = NULL;
+	beaconthread->beacons = beacons_new();
+	beaconthread->beaconsend = NULL;
+	beaconthread->beaconsendcount = 0;
 	beaconthread->running = 0;
 	beaconthread->finish_callback = NULL;
 	beaconthread->user_data = NULL;
@@ -179,8 +135,7 @@ BeaconThread * beaconthread_new() {
  * @param beaconthread The object to free.
  */
 void beaconthread_delete(BeaconThread * beaconthread) {
-	Device * current;
-	Device * next;
+	size_t count;
 
 	if (beaconthread) {
 		if (beaconthread->code) {
@@ -188,21 +143,23 @@ void beaconthread_delete(BeaconThread * beaconthread) {
 			beaconthread->code = NULL;
 		}
 		
-		if (beaconthread->devices) {
-			next = beaconthread->devices->first;
-			while (next != NULL) {
-				current = next;
-				next = current->next;
-				if (current->beaconsend) {
-					beaconsend_delete(current->beaconsend);
-					current->beaconsend = NULL;
-				}
-
-				FREE(current);
-			}
-			FREE(beaconthread->devices);
-			beaconthread->devices = NULL;
+		if (beaconthread->beacons) {
+			beacons_delete(beaconthread->beacons);
+			beaconthread->beacons = NULL;
 		}
+
+		if (beaconthread->beaconsend) {
+			for (count = 0; count < beaconthread->beaconsendcount; count++) {
+				if (beaconthread->beaconsend[count] != NULL) {
+					beaconsend_delete(beaconthread->beaconsend[count]);
+					beaconthread->beaconsend[count] = NULL;
+				}
+			}
+
+			FREE(beaconthread->beaconsend);
+			beaconthread->beaconsend = NULL;
+		}
+		beaconthread->beaconsendcount = 0;
 
 		if (beaconthread->configdir != NULL) {
 			buffer_delete(beaconthread->configdir);
@@ -278,67 +235,6 @@ void beaconthread_set_configdir(BeaconThread * beaconthread, Buffer const * conf
 }
 
 /**
- * Load in a list of Bluetooth MACs from file. These are the addresses that
- * beacons will be sent to.
- *
- * MAC addresses are in the format XX:XX:XX:XX:XX:XX where XX represents a
- * hexadecimal byte. One MAC address per line.
- *
- * The resulting list of devices is stored in the beaconthread data structure.
- *
- * @param beaconthread The object to store the data in.
- * @param filename The file to read the addresses from.
- */
-static void beaconthread_load_devices(BeaconThread * beaconthread, char const * filename) {
-	FILE * input;
-	char readLine[DEVICES_LINE_MAX + 1];
-	char * start;
-	bool more;
-	Device * device;
-	Device ** next;
-	bool result;
-	char const * code;
-
-	input = fopen(filename, "r");
-	if (input) {
-		next = & beaconthread->devices->first;
-
-		more = true;
-		while (more) {
-			more = false;
-			start = fgets(readLine, DEVICES_LINE_MAX + 1, input);
-			readLine[DEVICES_LINE_MAX - 2] = '\0';
-
-			if (start != NULL) {
-				if (readLine[0] != '#') {
-					device = CALLOC(sizeof(Device), 1);
-					*next = device;
-					next = & device->next;
-
-					device->device = MALLOC(DEVICES_LINE_MAX);
-					strcpy(device->device, readLine);
-
-					device->beaconsend = beaconsend_new();
-					result = beaconsend_set_device(device->beaconsend, device->device);
-					if (result == FALSE) {
-						LOG(LOG_ERR, "Failed to set device: %s\n", device->device);
-					}
-
-					code = buffer_get_buffer(beaconthread->code);
-					beaconsend_set_code(device->beaconsend, code);
-
-					LOG(LOG_INFO, "Read: %s\n", device->device);
-					beaconthread->devices->num++;
-				}
-				more = true;
-			}
-		}
-
-		fclose(input);
-	}
-}
-
-/**
  * Start the beacon session. This will create multiple instances of BeaconSend
  * for each device that beacons are sent to.
  *
@@ -347,15 +243,22 @@ static void beaconthread_load_devices(BeaconThread * beaconthread, char const * 
  *
  * @param beaconthread The object to use for the new session.
  */
-void beaconthread_start(BeaconThread * beaconthread) {
-	Device * current;
+void beaconthread_start(BeaconThread * beaconthread, Users const * users) {
+	BeaconDevice * current;
 	Buffer * btlistfilename;
+	size_t devicenum;
+	size_t count;
+	char const * device;
+	bool result;
+	char const * code;
+	BeaconSend * beaconsend;
 
 	btlistfilename = buffer_new(0);
 	buffer_append_buffer(btlistfilename, beaconthread->configdir);
 	buffer_append_string(btlistfilename, BT_LIST_FILE);
 
-	beaconthread_load_devices(beaconthread, buffer_get_buffer(btlistfilename));
+	//beaconthread_load_devices(beaconthread, buffer_get_buffer(btlistfilename), users);
+	devicenum = beacons_load_devices(beaconthread->beacons, buffer_get_buffer(btlistfilename), users);
 
 	buffer_delete(btlistfilename);
 
@@ -363,14 +266,30 @@ void beaconthread_start(BeaconThread * beaconthread) {
 
 	LOG(LOG_INFO, "Sending beacons\n");
 
-	current = beaconthread->devices->first;
+	beaconthread->beaconsend = CALLOC(sizeof(BeaconSend *), devicenum);
+	beaconthread->beaconsendcount = devicenum;
+
+	current = beacons_get_first(beaconthread->beacons);
+	count = 0;
 	while (current != NULL) {
-		if (current->beaconsend) {
-			beaconthread->running++;
-			beaconsend_set_finished_callback(current->beaconsend, beaconthread_finished, beaconthread);
-			beaconsend_start(current->beaconsend);
+		beaconsend = beaconsend_new();
+		beaconthread->beaconsend[count] = beaconsend;
+
+		device = beacons_get_address(current);
+		result = beaconsend_set_device(beaconsend, device);
+		if (result == FALSE) {
+			LOG(LOG_ERR, "Failed to set device: %s\n", device);
 		}
-		current = current->next;
+
+		code = buffer_get_buffer(beaconthread->code);
+		beaconsend_set_code(beaconsend, code);
+
+		beaconthread->running++;
+		beaconsend_set_finished_callback(beaconsend, beaconthread_finished, beaconthread);
+		beaconsend_start(beaconsend);
+
+		count++;
+		current = beacons_get_next(current);
 	}
 }
 
@@ -385,16 +304,16 @@ void beaconthread_start(BeaconThread * beaconthread) {
  * @param beaconthread The session to stop.
  */
 void beaconthread_stop(BeaconThread * beaconthread) {
-	Device * current;
+	BeaconSend * beaconsend;
+	size_t count;
 
 	LOG(LOG_INFO, "Stopping beacon session\n");
 
-	current = beaconthread->devices->first;
-	while (current != NULL) {
-		if (current->beaconsend) {
-			beaconsend_stop(current->beaconsend);
+	for (count = 0; count < beaconthread->beaconsendcount; count++) {
+		beaconsend = beaconthread->beaconsend[count];
+		if (beaconsend != NULL) {
+			beaconsend_stop(beaconsend);
 		}
-		current = current->next;
 	}
 
 	LOG(LOG_INFO, "Request stop while running: %d\n", beaconthread->running);

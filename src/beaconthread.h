@@ -117,7 +117,7 @@ void beaconthread_set_code(BeaconThread * beaconthread, char const * code);
 void beaconthread_set_finished_callback(BeaconThread * beaconthread, BeaconThreadFinishCallback callback, void * user_data);
 void beaconthread_set_configdir(BeaconThread * beaconthread, Buffer const * configdir);
 
-void beaconthread_start(BeaconThread * beaconthread);
+void beaconthread_start(BeaconThread * beaconthread, Users const * users);
 void beaconthread_stop(BeaconThread * beaconthread);
 
 // Function definitions
