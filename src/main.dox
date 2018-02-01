@@ -24,14 +24,15 @@ The installation instructions below assume you're using Ubuntu 16.04. It will bu
 If you're running Ubuntu 16.04 you can install `pam_pico` directly from the Pico PPA. Enter the following commands to add the PPA to your system:
 
 \verbatim
-sudo add-apt-repository ppa:mypico/ppa
-sudo apt-get update
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 22991E96
+sudo add-apt-repository "deb https://get.mypico.org/apt/ xenial main"
+sudo apt update
 \endverbatim
 
 Then install `pam_pico` using the following commands. As well as `pam_pico`, this will also automatically install all of its dependencies.
 
 \verbatim
-sudo apt install pam_pico
+sudo apt install libpam-pico
 \endverbatim
 
 If you don't want to add the Pico PPA, you can also download the latest package from the [Pico website](https:mypico.org). You'll need to install all of the dependencies yourself if you do it this way.

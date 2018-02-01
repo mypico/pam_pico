@@ -14,9 +14,23 @@ If you want to build all the Pico components from source in one go, without havi
 
 https://github.com/mypico/pico-build-all
 
+## Install the binary
+
+If you're using Ubunutu 16.04 you can install directly from the Pico repository. Just add the repository:
+```
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 22991E96
+sudo add-apt-repository "deb https://get.mypico.org/apt/ xenial main"
+sudo apt update
+```
+
+then install pam_pico:
+```
+sudo apt install libpam-pico
+```
+
 ## Install from source
 
-You'll need to ensure you've installed the [build dependencies](https://docs.mypico.org/developer/pam_pico/#deps) before you attempt to compile and install pam_pico. This includes building and installing libpicobt and libpico from the Pico repositories. See the [libpicobt](https://github.com/mypico/libpicobt) and the [libpico](https://github.com/mypico/libpico) repositories for instructions for this.
+You'll need to ensure you've installed the [build dependencies](https://docs.mypico.org/developer/pam_pico/#build) before you attempt to compile and install pam_pico. This includes building and installing libpicobt and libpico from the Pico repositories. See the [libpicobt](https://github.com/mypico/libpicobt) and the [libpico](https://github.com/mypico/libpico) repositories for instructions for this.
 
 If you're using Ubuntu 16.04, you can install the remaining build dependencies using `apt`.
 
