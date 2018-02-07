@@ -63,6 +63,10 @@ debuild -us -uc -b --lintian-opts -X changes-file
 sudo dpkg -i ../libpam-pico_0.0.2-1_amd64.deb
 ```
 
+## Using pam_pico
+
+For info about how to use pam_pico see the developer documentation on [configuring pam_pico](https://docs.mypico.org/developer/pam_pico/#configure) and [pairing it with your Pico](https://docs.mypico.org/developer/pam_pico/#pairing).
+
 ## Continuous Authentication Service
 
 The package installs the pico-continuous service to support continuous 
