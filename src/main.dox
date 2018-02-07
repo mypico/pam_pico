@@ -146,7 +146,7 @@ Once the `pam_pico` package has been installed, you'll be forgiven for thinking 
 
 The instructions in the \ref configure-pam section explains how to do this. You may also want to configure the `pico-continuous` service, as explained in section \ref configure-service, however this second step is optional.
 
-In theory you can use `pam_pico` with any of the applications that appear in the `/etc/pam.d` directory. We've tested it with unity, lightdm-greeter, gnome-screensave, ssh and sudo. However, we'd advise caution before using it with sudo, at least initially, since if something goes wrong you'll need a working sudo to fix it.
+In theory you can use `pam_pico` with any of the applications that appear in the `/etc/pam.d` directory. We've tested it with unity, lightdm-greeter, gnome-screensaver, ssh and sudo. However, we'd advise caution before using it with sudo, at least initially, since if something goes wrong you'll need a working sudo to fix it.
 
 \subsubsection configure-pam Configuring pam_pico
 
