@@ -305,7 +305,7 @@ This will ask you to enter your user password, before displaying a QR code on th
 The GUI version walks you through the process a little more gently. This can be started by entering `pico-pair` on the Unity dash, or by entering the following command at the terminal.
 
 \verbatim
-gksu "pico-pair --gui --user $USER"
+gksu -k "pico-pair --gui --user $USER"
 \endverbatim
 
 In both cases, you'll also need to ensure your phone is *bluetooth paired* with your computer. Bluetooth pairing can be performed through the System Settings panel on Ubuntu, or through the <a href="https://help.ubuntu.com/stable/ubuntu-help/bluetooth-connect-device.html">Bluetooth icon on the menu bar</a>.
