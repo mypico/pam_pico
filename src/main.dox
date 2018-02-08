@@ -84,6 +84,7 @@ To build on Linux you'll need the following (at least):
  - pkg-config
  - autoconf
  - autotools-dev
+ - automake
  - devscripts
  - debhelper
  - dh-systemd
@@ -104,8 +105,8 @@ See the [libpicobt](../libpicobt) documentation for how to install libpicobt-run
 sudo apt install \
   libssl-dev libcurl4-openssl-dev libqrencode-dev libbluetooth-dev liburl-dispatcher1-dev libc6 \
   libsoup2.4-dev libglib2.0-dev libdbus-glib-1-dev libgtk-3-dev libpam0g-dev gksu \
-  autoconf pkg-config autotools-dev devscripts debhelper dh-systemd dh-exec build-essential \
-  git gcc make check openssh-client libtool doxygen graphviz
+  autoconf pkg-config autotools-dev automake devscripts debhelper dh-systemd dh-exec \
+  build-essential git gcc make check openssh-client libtool doxygen graphviz
 \endverbatim
 
 Now grab yourself a copy of the code from the repository and compile it.
