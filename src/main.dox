@@ -183,11 +183,11 @@ auth optional pam_gnome_keyring.so
 \endverbatim
 
 As you can see we've added an `auth` line. Here's what the various parts of this additional line
-mean:
+mean (for full details, see the <a href="http://linux-pam.org/Linux-PAM-html/sag-configuration-file.html">PAM sysadmin's guide</a> again):
 
  1. `auth` means that we're adding a module for *authentication*.
  2. `required` means that if authentication fails with this module, the
- overall authentication will fail, and no more lines will be executed.
+ overall authentication will fail, but not until the modules listed after have also been invoked.
  3. `/usr/lib/x86_64-linux-gnu/security/pam_pico.so` is a reference to the
  `pam_pico` module. This means the task of authentication will be handled
  by this module.
