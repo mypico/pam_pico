@@ -177,7 +177,7 @@ the `common-auth` file that's included in this one).
 To add Pico functionality, you'd need to add a new line to the top of the file, as well as commenting out the `@include` line, like this.
 
 \verbatim
-auth    required /usr/lib/x86_64-linux-gnu/security/pam_pico.so beacons=1 anyuser=1 input=0 qrtype=none channeltype=btc continuous=1 timeout=0
+auth    required /usr/lib/x86_64-linux-gnu/security/pam_pico.so channeltype=btc continuous=1 beacons=1 anyuser=1 qrtype=none input=0 timeout=0
 #@include common-auth
 auth optional pam_gnome_keyring.so
 \endverbatim
@@ -186,12 +186,12 @@ As you can see we've added an `auth` line. Here's what the various parts of this
 mean:
 
  1. `auth` means that we're adding a module for *authentication*.
- 2. `requisite` means that if authentication fails with this module, the
+ 2. `required` means that if authentication fails with this module, the
  overall authentication will fail, and no more lines will be executed.
  3. `/usr/lib/x86_64-linux-gnu/security/pam_pico.so` is a reference to the
  `pam_pico` module. This means the task of authentication will be handled
  by this module.
- 4. `beacons=1 anyuser=1 input=0 qrtype=none channeltype=btc continuous=1 timeout=0`
+ 4. `channeltype=btc continuous=1 beacons=1 anyuser=1 qrtype=none input=0 timeout=0`
  are arguments passed to the `pam_pico` module. These are briefly described below.
 
 The arguments that can be added to the end of the line are the following. Some of these can also be added to the service configuration file (see the {@link configure-service} section), but values added as arguments as shown here override those in the configuration file.
@@ -202,11 +202,11 @@ The arguments that can be added to the end of the line are the following. Some o
 
  - `continuous=`
 
-   This can be set to either `0` or `1`, for example `continuous=1``. When set to `1`, continuous authentication will be performed. This means that Pico will continue periodic authentications with the pico-continuous service. If authentication fails for whatever reason (for example, the Pico moves out of Bluetooth range) then a signal will be made to lock the session.
+   This can be set to either `0` or `1`, for example `continuous=1`. When set to `1`, continuous authentication will be performed. This means that Pico will continue periodic authentications with the pico-continuous service. If authentication fails for whatever reason (for example, the Pico moves out of Bluetooth range) then a signal will be made to lock the session.
 
  - `beacons=`
 
-   This can be set to either `0` or `1`, for example `beacons=1``. When set to `1`, beacons will be sent to nearby Picos using Bluetooth classic, notifying them that they can attempt authentication. This is an alternative to scanning the QR code. This is most useful when the channel is set to be Bluetooth, but will also work for a rendezvous point channel.
+   This can be set to either `0` or `1`, for example `beacons=1`. When set to `1`, beacons will be sent to nearby Picos using Bluetooth Classic, notifying them that they can attempt authentication. This is an alternative to scanning the QR code.
 
  - `anyuser=`
 
@@ -214,11 +214,11 @@ The arguments that can be added to the end of the line are the following. Some o
 
  - `qrtype=`
 
-   Set the style of output to use for the displayed QR code. Possible values are: `json` to return a JSON string rather than a QR code; `color_utf8` for compact output that will work on a colour-enabled UTF8 terminal; `colorless_utf8` for compact output that will display in black and white on a UTF8 terminal; `ansi` for black and white output, two characters per pizel; `tt_tag` which produdes the same output as colorless_utf8, but surrounded by &lt;tt&gt; tags; `none` to display no output at all. For example `qrtype=color_utf8`.
+   Set the style of output to use for the displayed QR code. Possible values are: `json` to return a JSON string rather than a QR code; `color_utf8` for compact output that will work on a colour-enabled UTF8 terminal; `colorless_utf8` for compact output that will display in black and white on a UTF8 terminal; `ansi` for black and white output, two characters per pixel; `tt_tag` which produdes the same output as colorless_utf8, but surrounded by &lt;tt&gt; tags; `none` to display no output at all. For example `qrtype=color_utf8`.
 
  - `input=`
 
-   This can be set to either `0` or `1`, for example `input=1``. When set to `1`, the module will request user input; when set to `0` it will not request any input. Depending on the PAM client implementation, input may be required to ensure the Pico response is collected. (e.g. ssh) In other implementations, asking for a response will block the authentication from proceeding until the user has hit the enter key. This flag allows the input request to be controlled to take account of these different implementation specifics.
+   This can be set to either `0` or `1`, for example `input=1`. When set to `1`, the module will request user input; when set to `0` it will not request any input. Depending on the PAM client implementation, input may be required to ensure the Pico response is collected. (e.g. ssh) In other implementations, asking for a response will block the authentication from proceeding until the user has hit the enter key. This flag allows the input request to be controlled to take account of these different implementation specifics.
 
  - `timeout=`
 
