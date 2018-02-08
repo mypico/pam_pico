@@ -293,7 +293,7 @@ Having installed and configured `pam_pico`, you must now pair with the system be
 
 Pairing is performed using the `pico-pair` application. The application has to run as root in order to get write-access to the keypairing directory on the system. It also takes various command line arguments. For full details of these arguments check the `pico-pair` man page.
 
-To use the default terminal interface you can use the following command:
+Both your computer and phone must have Internet access in order for them to pair. Then to use the default terminal interface you can use the following command:
 
 \verbatim
 sudo pico-pair --user $USER
