@@ -114,6 +114,7 @@ Now grab yourself a copy of the code from the repository and compile it.
 \verbatim
 git clone git@github.com:mypico/pam_pico.git
 cd pam_pico
+autoreconf --force --install
 ./configure
 make
 make check
