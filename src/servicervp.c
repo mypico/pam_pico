@@ -529,7 +529,7 @@ static void servicervp_write(char const * data, size_t length, void * user_data)
 static void servicervp_set_timeout(int timeout, void * user_data) {
 	ServiceRvp * servicervp = (ServiceRvp *)user_data;
 
-	LOG(LOG_DEBUG, "Requesting timeout");
+	LOG(LOG_DEBUG, "Requesting timeout of %d", timeout);
 
 	// Remove any previous timeout
 	if (servicervp->service.timeoutid != 0) {
