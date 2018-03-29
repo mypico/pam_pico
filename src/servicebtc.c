@@ -24,13 +24,13 @@
  * <http://www.gnu.org/licenses/>.
  *
  *
- * @brief Provides Bluetooth event support to tie to FsmService
+ * @brief Provides Bluetooth Classic event support to tie to FsmService
  * @section DESCRIPTION
  *
  * FSMService provides only a framework of callbacks and events, but without
  * any way of communicating. The communication channel has to be tied to it
  * to make it work. This code provides the implementation of the callbacks to
- * allow the state machine to work with a Classic Bluetooth channel in order
+ * allow the state machine to work with a Bluetooth Classic channel in order
  * to actually support authentication.
  *
  * On top of this, it also controls the sending of Bluetooth beacons to other
