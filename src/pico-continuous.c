@@ -111,7 +111,7 @@
 
 #include "log.h"
 #include "processstore.h"
-#include "gdbus-generated.h"
+#include "gdbus-generated-cont.h"
 
 // Defines
 

@@ -174,7 +174,7 @@ lib_pam_test_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(lib_pam_test_la_CFLAGS) $(CFLAGS) $(lib_pam_test_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
 lib_service_test_la_DEPENDENCIES =
-am__objects_2 = src/lib_service_test_la-gdbus-generated.lo
+am__objects_2 = src/lib_service_test_la-gdbus-generated-cont.lo
 am_lib_service_test_la_OBJECTS = $(am__objects_2) \
 	src/lib_service_test_la-pico-continuous.lo \
 	src/lib_service_test_la-processstore.lo \
@@ -191,7 +191,7 @@ lib_service_test_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(lib_service_test_la_CFLAGS) $(CFLAGS) \
 	$(lib_service_test_la_LDFLAGS) $(LDFLAGS) -o $@
 pam_pico_la_DEPENDENCIES =
-am__objects_3 = src/pam_pico_la-gdbus-generated.lo
+am__objects_3 = src/pam_pico_la-gdbus-generated-cont.lo
 am_pam_pico_la_OBJECTS = $(am__objects_3) src/pam_pico_la-pam_pico.lo \
 	$(am__objects_1)
 pam_pico_la_OBJECTS = $(am_pam_pico_la_OBJECTS)
@@ -201,7 +201,9 @@ pam_pico_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 am__EXEEXT_1 = tests/test_pam$(EXEEXT) tests/test_auth$(EXEEXT) \
 	tests/test_beacons$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
-am_pico_continuous_OBJECTS =  \
+am__objects_4 = src/pico_continuous-gdbus-generated-cont.$(OBJEXT)
+am__objects_5 = src/pico_continuous-gdbus-generated-ble.$(OBJEXT)
+am_pico_continuous_OBJECTS = $(am__objects_4) $(am__objects_5) \
 	src/pico_continuous-pico-continuous.$(OBJEXT) \
 	src/pico_continuous-processstore.$(OBJEXT) \
 	src/pico_continuous-auththread.$(OBJEXT) \
@@ -211,7 +213,7 @@ am_pico_continuous_OBJECTS =  \
 	src/pico_continuous-service.$(OBJEXT) \
 	src/pico_continuous-servicebtc.$(OBJEXT) \
 	src/pico_continuous-servicervp.$(OBJEXT) \
-	src/pico_continuous-gdbus-generated.$(OBJEXT) $(am__objects_1)
+	src/pico_continuous-serviceble.$(OBJEXT) $(am__objects_1)
 pico_continuous_OBJECTS = $(am_pico_continuous_OBJECTS)
 pico_continuous_LDADD = $(LDADD)
 pico_continuous_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
@@ -727,8 +729,11 @@ dist_doc_DATA = AUTHORS ChangeLog INSTALL NEWS README.md
 MODULES_LDFLAGS = -avoid-version -module -shared -export-dynamic
 CORE_SRC = src/pam_pico.h
 
-# Generate gdbus code
-gdbus_generated = src/gdbus-generated.c src/gdbus-generated.h
+# Generate service gdbus code
+gdbus_generated_cont = src/gdbus-generated-cont.c src/gdbus-generated-cont.h
+
+# Generate BLE gdbus code
+gdbus_generated_ble = src/gdbus-generated-ble.c src/gdbus-generated-ble.h
 
 # Pairing executable
 pico_pair_SOURCES = \
@@ -748,6 +753,8 @@ pico_test_LDFLAGS = $(AM_LDFLAGS) $(MODULES_LDFLAGS) @PICO_LIBS@ @PICOBT_LIBS@ @
 
 # Continuous authenticaton service
 pico_continuous_SOURCES = \
+	$(gdbus_generated_cont) \
+	$(gdbus_generated_ble) \
 	src/pico-continuous.c \
 	src/processstore.c \
 	src/auththread.c \
@@ -757,7 +764,7 @@ pico_continuous_SOURCES = \
 	src/service.c \
 	src/servicebtc.c \
 	src/servicervp.c \
-	src/gdbus-generated.c \
+	src/serviceble.c \
 	src/processstore.h \
 	src/auththread.h \
 	src/beaconthread.h \
@@ -767,15 +774,15 @@ pico_continuous_SOURCES = \
 	src/service_private.h \
 	src/servicebtc.h \
 	src/servicervp.h \
-	src/gdbus-generated.h \
+	src/serviceble.h \
 	$(CORE_SRC)
 
-pico_continuous_CFLAGS = $(AM_CFLAGS) @PICO_CFLAGS@ @PICOBT_CFLAGS@ @GLIB_CFLAGS@
-pico_continuous_LDFLAGS = $(AM_LDFLAGS) $(MODULES_LDFLAGS) @PICO_LIBS@ @PICOBT_LIBS@ @GLIB_LIBS@
+pico_continuous_CFLAGS = $(AM_CFLAGS) @PICO_CFLAGS@ @PICOBT_CFLAGS@ @GLIB_CFLAGS@ @DBUSGLIB_CFLAGS@
+pico_continuous_LDFLAGS = $(AM_LDFLAGS) $(MODULES_LDFLAGS) @PICO_LIBS@ @PICOBT_LIBS@ @GLIB_LIBS@ @DBUSGLIB_LIBS@
 
 # PAM module
 pam_pico_la_SOURCES = \
-	$(gdbus_generated) \
+	$(gdbus_generated_cont) \
 	src/pam_pico.c \
 	$(CORE_SRC)
 
@@ -792,7 +799,7 @@ lib_pam_test_la_LIBADD = @PICO_LIBS@
 lib_pam_test_la_CFLAGS = $(AM_CFLAGS) @PICO_CFLAGS@ @PICOBT_CFLAGS@ @GLIB_CFLAGS@ @DBUSGLIB_CFLAGS@
 lib_pam_test_la_LDFLAGS = $(AM_LDFLAGS) 
 lib_service_test_la_SOURCES = \
-	$(gdbus_generated) \
+	$(gdbus_generated_cont) \
 	src/pico-continuous.c \
 	src/processstore.c \
 	src/auththread.c \
@@ -1001,7 +1008,7 @@ src/lib_pam_test_la-pam_pico.lo: src/$(am__dirstamp) \
 
 lib_pam_test.la: $(lib_pam_test_la_OBJECTS) $(lib_pam_test_la_DEPENDENCIES) $(EXTRA_lib_pam_test_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(lib_pam_test_la_LINK)  $(lib_pam_test_la_OBJECTS) $(lib_pam_test_la_LIBADD) $(LIBS)
-src/lib_service_test_la-gdbus-generated.lo: src/$(am__dirstamp) \
+src/lib_service_test_la-gdbus-generated-cont.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/lib_service_test_la-pico-continuous.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
@@ -1024,7 +1031,7 @@ src/lib_service_test_la-servicervp.lo: src/$(am__dirstamp) \
 
 lib_service_test.la: $(lib_service_test_la_OBJECTS) $(lib_service_test_la_DEPENDENCIES) $(EXTRA_lib_service_test_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(lib_service_test_la_LINK)  $(lib_service_test_la_OBJECTS) $(lib_service_test_la_LIBADD) $(LIBS)
-src/pam_pico_la-gdbus-generated.lo: src/$(am__dirstamp) \
+src/pam_pico_la-gdbus-generated-cont.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/pam_pico_la-pam_pico.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
@@ -1089,6 +1096,10 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+src/pico_continuous-gdbus-generated-cont.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/pico_continuous-gdbus-generated-ble.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/pico_continuous-pico-continuous.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/pico_continuous-processstore.$(OBJEXT): src/$(am__dirstamp) \
@@ -1107,7 +1118,7 @@ src/pico_continuous-servicebtc.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/pico_continuous-servicervp.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/pico_continuous-gdbus-generated.$(OBJEXT): src/$(am__dirstamp) \
+src/pico_continuous-serviceble.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 
 pico-continuous$(EXEEXT): $(pico_continuous_OBJECTS) $(pico_continuous_DEPENDENCIES) $(EXTRA_pico_continuous_DEPENDENCIES) 
@@ -1170,22 +1181,24 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/lib_service_test_la-auththread.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/lib_service_test_la-beaconsend.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/lib_service_test_la-beaconthread.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/lib_service_test_la-gdbus-generated.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/lib_service_test_la-gdbus-generated-cont.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/lib_service_test_la-pico-continuous.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/lib_service_test_la-processstore.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/lib_service_test_la-service.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/lib_service_test_la-servicebtc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/lib_service_test_la-servicervp.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pam_pico_la-gdbus-generated.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pam_pico_la-gdbus-generated-cont.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pam_pico_la-pam_pico.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-authconfig.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-auththread.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-beaconsend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-beaconthread.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-gdbus-generated.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-gdbus-generated-ble.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-gdbus-generated-cont.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-pico-continuous.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-processstore.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-service.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-serviceble.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-servicebtc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-servicervp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_pair-pico-pair.Po@am__quote@
@@ -1242,12 +1255,12 @@ src/lib_pam_test_la-pam_pico.lo: src/pam_pico.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_pam_test_la_CFLAGS) $(CFLAGS) -c -o src/lib_pam_test_la-pam_pico.lo `test -f 'src/pam_pico.c' || echo '$(srcdir)/'`src/pam_pico.c
 
-src/lib_service_test_la-gdbus-generated.lo: src/gdbus-generated.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_service_test_la_CFLAGS) $(CFLAGS) -MT src/lib_service_test_la-gdbus-generated.lo -MD -MP -MF src/$(DEPDIR)/lib_service_test_la-gdbus-generated.Tpo -c -o src/lib_service_test_la-gdbus-generated.lo `test -f 'src/gdbus-generated.c' || echo '$(srcdir)/'`src/gdbus-generated.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/lib_service_test_la-gdbus-generated.Tpo src/$(DEPDIR)/lib_service_test_la-gdbus-generated.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/gdbus-generated.c' object='src/lib_service_test_la-gdbus-generated.lo' libtool=yes @AMDEPBACKSLASH@
+src/lib_service_test_la-gdbus-generated-cont.lo: src/gdbus-generated-cont.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_service_test_la_CFLAGS) $(CFLAGS) -MT src/lib_service_test_la-gdbus-generated-cont.lo -MD -MP -MF src/$(DEPDIR)/lib_service_test_la-gdbus-generated-cont.Tpo -c -o src/lib_service_test_la-gdbus-generated-cont.lo `test -f 'src/gdbus-generated-cont.c' || echo '$(srcdir)/'`src/gdbus-generated-cont.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/lib_service_test_la-gdbus-generated-cont.Tpo src/$(DEPDIR)/lib_service_test_la-gdbus-generated-cont.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/gdbus-generated-cont.c' object='src/lib_service_test_la-gdbus-generated-cont.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_service_test_la_CFLAGS) $(CFLAGS) -c -o src/lib_service_test_la-gdbus-generated.lo `test -f 'src/gdbus-generated.c' || echo '$(srcdir)/'`src/gdbus-generated.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_service_test_la_CFLAGS) $(CFLAGS) -c -o src/lib_service_test_la-gdbus-generated-cont.lo `test -f 'src/gdbus-generated-cont.c' || echo '$(srcdir)/'`src/gdbus-generated-cont.c
 
 src/lib_service_test_la-pico-continuous.lo: src/pico-continuous.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_service_test_la_CFLAGS) $(CFLAGS) -MT src/lib_service_test_la-pico-continuous.lo -MD -MP -MF src/$(DEPDIR)/lib_service_test_la-pico-continuous.Tpo -c -o src/lib_service_test_la-pico-continuous.lo `test -f 'src/pico-continuous.c' || echo '$(srcdir)/'`src/pico-continuous.c
@@ -1312,12 +1325,12 @@ src/lib_service_test_la-servicervp.lo: src/servicervp.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_service_test_la_CFLAGS) $(CFLAGS) -c -o src/lib_service_test_la-servicervp.lo `test -f 'src/servicervp.c' || echo '$(srcdir)/'`src/servicervp.c
 
-src/pam_pico_la-gdbus-generated.lo: src/gdbus-generated.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pam_pico_la_CFLAGS) $(CFLAGS) -MT src/pam_pico_la-gdbus-generated.lo -MD -MP -MF src/$(DEPDIR)/pam_pico_la-gdbus-generated.Tpo -c -o src/pam_pico_la-gdbus-generated.lo `test -f 'src/gdbus-generated.c' || echo '$(srcdir)/'`src/gdbus-generated.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/pam_pico_la-gdbus-generated.Tpo src/$(DEPDIR)/pam_pico_la-gdbus-generated.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/gdbus-generated.c' object='src/pam_pico_la-gdbus-generated.lo' libtool=yes @AMDEPBACKSLASH@
+src/pam_pico_la-gdbus-generated-cont.lo: src/gdbus-generated-cont.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pam_pico_la_CFLAGS) $(CFLAGS) -MT src/pam_pico_la-gdbus-generated-cont.lo -MD -MP -MF src/$(DEPDIR)/pam_pico_la-gdbus-generated-cont.Tpo -c -o src/pam_pico_la-gdbus-generated-cont.lo `test -f 'src/gdbus-generated-cont.c' || echo '$(srcdir)/'`src/gdbus-generated-cont.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/pam_pico_la-gdbus-generated-cont.Tpo src/$(DEPDIR)/pam_pico_la-gdbus-generated-cont.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/gdbus-generated-cont.c' object='src/pam_pico_la-gdbus-generated-cont.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pam_pico_la_CFLAGS) $(CFLAGS) -c -o src/pam_pico_la-gdbus-generated.lo `test -f 'src/gdbus-generated.c' || echo '$(srcdir)/'`src/gdbus-generated.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pam_pico_la_CFLAGS) $(CFLAGS) -c -o src/pam_pico_la-gdbus-generated-cont.lo `test -f 'src/gdbus-generated-cont.c' || echo '$(srcdir)/'`src/gdbus-generated-cont.c
 
 src/pam_pico_la-pam_pico.lo: src/pam_pico.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pam_pico_la_CFLAGS) $(CFLAGS) -MT src/pam_pico_la-pam_pico.lo -MD -MP -MF src/$(DEPDIR)/pam_pico_la-pam_pico.Tpo -c -o src/pam_pico_la-pam_pico.lo `test -f 'src/pam_pico.c' || echo '$(srcdir)/'`src/pam_pico.c
@@ -1325,6 +1338,34 @@ src/pam_pico_la-pam_pico.lo: src/pam_pico.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/pam_pico.c' object='src/pam_pico_la-pam_pico.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pam_pico_la_CFLAGS) $(CFLAGS) -c -o src/pam_pico_la-pam_pico.lo `test -f 'src/pam_pico.c' || echo '$(srcdir)/'`src/pam_pico.c
+
+src/pico_continuous-gdbus-generated-cont.o: src/gdbus-generated-cont.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -MT src/pico_continuous-gdbus-generated-cont.o -MD -MP -MF src/$(DEPDIR)/pico_continuous-gdbus-generated-cont.Tpo -c -o src/pico_continuous-gdbus-generated-cont.o `test -f 'src/gdbus-generated-cont.c' || echo '$(srcdir)/'`src/gdbus-generated-cont.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/pico_continuous-gdbus-generated-cont.Tpo src/$(DEPDIR)/pico_continuous-gdbus-generated-cont.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/gdbus-generated-cont.c' object='src/pico_continuous-gdbus-generated-cont.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -c -o src/pico_continuous-gdbus-generated-cont.o `test -f 'src/gdbus-generated-cont.c' || echo '$(srcdir)/'`src/gdbus-generated-cont.c
+
+src/pico_continuous-gdbus-generated-cont.obj: src/gdbus-generated-cont.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -MT src/pico_continuous-gdbus-generated-cont.obj -MD -MP -MF src/$(DEPDIR)/pico_continuous-gdbus-generated-cont.Tpo -c -o src/pico_continuous-gdbus-generated-cont.obj `if test -f 'src/gdbus-generated-cont.c'; then $(CYGPATH_W) 'src/gdbus-generated-cont.c'; else $(CYGPATH_W) '$(srcdir)/src/gdbus-generated-cont.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/pico_continuous-gdbus-generated-cont.Tpo src/$(DEPDIR)/pico_continuous-gdbus-generated-cont.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/gdbus-generated-cont.c' object='src/pico_continuous-gdbus-generated-cont.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -c -o src/pico_continuous-gdbus-generated-cont.obj `if test -f 'src/gdbus-generated-cont.c'; then $(CYGPATH_W) 'src/gdbus-generated-cont.c'; else $(CYGPATH_W) '$(srcdir)/src/gdbus-generated-cont.c'; fi`
+
+src/pico_continuous-gdbus-generated-ble.o: src/gdbus-generated-ble.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -MT src/pico_continuous-gdbus-generated-ble.o -MD -MP -MF src/$(DEPDIR)/pico_continuous-gdbus-generated-ble.Tpo -c -o src/pico_continuous-gdbus-generated-ble.o `test -f 'src/gdbus-generated-ble.c' || echo '$(srcdir)/'`src/gdbus-generated-ble.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/pico_continuous-gdbus-generated-ble.Tpo src/$(DEPDIR)/pico_continuous-gdbus-generated-ble.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/gdbus-generated-ble.c' object='src/pico_continuous-gdbus-generated-ble.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -c -o src/pico_continuous-gdbus-generated-ble.o `test -f 'src/gdbus-generated-ble.c' || echo '$(srcdir)/'`src/gdbus-generated-ble.c
+
+src/pico_continuous-gdbus-generated-ble.obj: src/gdbus-generated-ble.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -MT src/pico_continuous-gdbus-generated-ble.obj -MD -MP -MF src/$(DEPDIR)/pico_continuous-gdbus-generated-ble.Tpo -c -o src/pico_continuous-gdbus-generated-ble.obj `if test -f 'src/gdbus-generated-ble.c'; then $(CYGPATH_W) 'src/gdbus-generated-ble.c'; else $(CYGPATH_W) '$(srcdir)/src/gdbus-generated-ble.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/pico_continuous-gdbus-generated-ble.Tpo src/$(DEPDIR)/pico_continuous-gdbus-generated-ble.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/gdbus-generated-ble.c' object='src/pico_continuous-gdbus-generated-ble.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -c -o src/pico_continuous-gdbus-generated-ble.obj `if test -f 'src/gdbus-generated-ble.c'; then $(CYGPATH_W) 'src/gdbus-generated-ble.c'; else $(CYGPATH_W) '$(srcdir)/src/gdbus-generated-ble.c'; fi`
 
 src/pico_continuous-pico-continuous.o: src/pico-continuous.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -MT src/pico_continuous-pico-continuous.o -MD -MP -MF src/$(DEPDIR)/pico_continuous-pico-continuous.Tpo -c -o src/pico_continuous-pico-continuous.o `test -f 'src/pico-continuous.c' || echo '$(srcdir)/'`src/pico-continuous.c
@@ -1452,19 +1493,19 @@ src/pico_continuous-servicervp.obj: src/servicervp.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -c -o src/pico_continuous-servicervp.obj `if test -f 'src/servicervp.c'; then $(CYGPATH_W) 'src/servicervp.c'; else $(CYGPATH_W) '$(srcdir)/src/servicervp.c'; fi`
 
-src/pico_continuous-gdbus-generated.o: src/gdbus-generated.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -MT src/pico_continuous-gdbus-generated.o -MD -MP -MF src/$(DEPDIR)/pico_continuous-gdbus-generated.Tpo -c -o src/pico_continuous-gdbus-generated.o `test -f 'src/gdbus-generated.c' || echo '$(srcdir)/'`src/gdbus-generated.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/pico_continuous-gdbus-generated.Tpo src/$(DEPDIR)/pico_continuous-gdbus-generated.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/gdbus-generated.c' object='src/pico_continuous-gdbus-generated.o' libtool=no @AMDEPBACKSLASH@
+src/pico_continuous-serviceble.o: src/serviceble.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -MT src/pico_continuous-serviceble.o -MD -MP -MF src/$(DEPDIR)/pico_continuous-serviceble.Tpo -c -o src/pico_continuous-serviceble.o `test -f 'src/serviceble.c' || echo '$(srcdir)/'`src/serviceble.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/pico_continuous-serviceble.Tpo src/$(DEPDIR)/pico_continuous-serviceble.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/serviceble.c' object='src/pico_continuous-serviceble.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -c -o src/pico_continuous-gdbus-generated.o `test -f 'src/gdbus-generated.c' || echo '$(srcdir)/'`src/gdbus-generated.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -c -o src/pico_continuous-serviceble.o `test -f 'src/serviceble.c' || echo '$(srcdir)/'`src/serviceble.c
 
-src/pico_continuous-gdbus-generated.obj: src/gdbus-generated.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -MT src/pico_continuous-gdbus-generated.obj -MD -MP -MF src/$(DEPDIR)/pico_continuous-gdbus-generated.Tpo -c -o src/pico_continuous-gdbus-generated.obj `if test -f 'src/gdbus-generated.c'; then $(CYGPATH_W) 'src/gdbus-generated.c'; else $(CYGPATH_W) '$(srcdir)/src/gdbus-generated.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/pico_continuous-gdbus-generated.Tpo src/$(DEPDIR)/pico_continuous-gdbus-generated.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/gdbus-generated.c' object='src/pico_continuous-gdbus-generated.obj' libtool=no @AMDEPBACKSLASH@
+src/pico_continuous-serviceble.obj: src/serviceble.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -MT src/pico_continuous-serviceble.obj -MD -MP -MF src/$(DEPDIR)/pico_continuous-serviceble.Tpo -c -o src/pico_continuous-serviceble.obj `if test -f 'src/serviceble.c'; then $(CYGPATH_W) 'src/serviceble.c'; else $(CYGPATH_W) '$(srcdir)/src/serviceble.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/pico_continuous-serviceble.Tpo src/$(DEPDIR)/pico_continuous-serviceble.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/serviceble.c' object='src/pico_continuous-serviceble.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -c -o src/pico_continuous-gdbus-generated.obj `if test -f 'src/gdbus-generated.c'; then $(CYGPATH_W) 'src/gdbus-generated.c'; else $(CYGPATH_W) '$(srcdir)/src/gdbus-generated.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -c -o src/pico_continuous-serviceble.obj `if test -f 'src/serviceble.c'; then $(CYGPATH_W) 'src/serviceble.c'; else $(CYGPATH_W) '$(srcdir)/src/serviceble.c'; fi`
 
 src/pico_pair-pico-pair.o: src/pico-pair.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_pair_CFLAGS) $(CFLAGS) -MT src/pico_pair-pico-pair.o -MD -MP -MF src/$(DEPDIR)/pico_pair-pico-pair.Tpo -c -o src/pico_pair-pico-pair.o `test -f 'src/pico-pair.c' || echo '$(srcdir)/'`src/pico-pair.c
@@ -2198,9 +2239,13 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dist_docDATA \
 .PRECIOUS: Makefile
 
 
-$(gdbus_generated): src/pico-cont-auth-gdbus.xml
+$(gdbus_generated_cont): src/pico-cont-auth-gdbus.xml
 	$(AM_V_GEN) \
-	$(GDBUS_CODEGEN) --interface-prefix uk.ac.cam.cl.pico.. --generate-c-code src/gdbus-generated --c-namespace Pico --c-generate-object-manager --generate-docbook doc/generated-docs $<
+	$(GDBUS_CODEGEN) --interface-prefix uk.ac.cam.cl.pico.. --generate-c-code src/gdbus-generated-cont --c-namespace Pico --c-generate-object-manager --generate-docbook doc/generated-docs $<
+
+$(gdbus_generated_ble): src/pico-ble-gdbus.xml
+	$(AM_V_GEN) \
+	$(GDBUS_CODEGEN) --interface-prefix org.bluez --generate-c-code src/gdbus-generated-ble --c-generate-object-manager --generate-docbook doc/generated-docs $<
 
 #tests_test_service_CFLAGS = $(AM_CFLAGS) @PICO_CFLAGS@ @CHECK_CFLAGS@ @GLIB_CFLAGS@
 #tests_test_service_LDADD = .libs/lib_service_test.la .libs/lib_mockbt.la @CHECK_LIBS@ @PICO_LIBS@ @GLIB_LIBS@

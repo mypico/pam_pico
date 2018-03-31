@@ -302,6 +302,7 @@ typedef enum _CHANNELTYPE {
 
 	CHANNELTYPE_RVP,
 	CHANNELTYPE_BTC,
+	CHANNELTYPE_BLE,
 
 	CHANNELTYPE_NUM
 } CHANNELTYPE;
@@ -326,6 +327,7 @@ typedef enum _CHANNELTYPE {
 static char const * const channeltypestring[CHANNELTYPE_NUM] = {
 	"rvp",
 	"btc",
+	"ble",
 };
 
 /**
@@ -821,6 +823,9 @@ void externalconfig_generate_json(ExternalConfig * externalconfig, Buffer * json
 			break;
 		case CHANNELTYPE_BTC:
 			json_add_string(parameters, "channeltype", "btc");
+			break;
+		case CHANNELTYPE_BLE:
+			json_add_string(parameters, "channeltype", "ble");
 			break;
 		default:
 			// Do nothing

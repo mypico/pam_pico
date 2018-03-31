@@ -63,7 +63,8 @@
  * types. This enumerates the possible types.
  *
  *  - AUTHCHANNEL_RVP: Rendevzous Point channel (HTTP/HTTPS)
- *  - AUTHCHANNEL_BT: Bluetooth
+ *  - AUTHCHANNEL_BTC: Bluetooth Classic
+ *  - AUTHCHANNEL_BLE: Bluetooth Low Energy
  *
  */
 typedef enum _AUTHCHANNEL {
@@ -71,6 +72,7 @@ typedef enum _AUTHCHANNEL {
 	
 	AUTHCHANNEL_RVP,
 	AUTHCHANNEL_BTC,
+	AUTHCHANNEL_BLE,
 	
 	AUTHCHANNEL_NUM
 } AUTHCHANNEL;

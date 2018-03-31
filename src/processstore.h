@@ -52,7 +52,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "gdbus-generated.h"
+#include "gdbus-generated-cont.h"
 #include "auththread.h"
 #include "beaconthread.h"
 

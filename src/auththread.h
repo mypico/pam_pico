@@ -64,7 +64,7 @@
 #include <picobt/devicelist.h>
 
 #include "authconfig.h"
-#include "gdbus-generated.h"
+#include "gdbus-generated-cont.h"
 
 // Defines
 

@@ -19,12 +19,21 @@ MODULES_LDFLAGS = -avoid-version -module -shared -export-dynamic
 CORE_SRC  =
 CORE_SRC += src/pam_pico.h
 
-# Generate gdbus code
-gdbus_generated = src/gdbus-generated.c src/gdbus-generated.h
+# Generate service gdbus code
+gdbus_generated_cont = src/gdbus-generated-cont.c src/gdbus-generated-cont.h
 
-$(gdbus_generated): src/pico-cont-auth-gdbus.xml
+$(gdbus_generated_cont): src/pico-cont-auth-gdbus.xml
 	$(AM_V_GEN) \
-	$(GDBUS_CODEGEN) --interface-prefix uk.ac.cam.cl.pico.. --generate-c-code src/gdbus-generated --c-namespace Pico --c-generate-object-manager --generate-docbook doc/generated-docs $<
+	$(GDBUS_CODEGEN) --interface-prefix uk.ac.cam.cl.pico.. --generate-c-code src/gdbus-generated-cont --c-namespace Pico --c-generate-object-manager --generate-docbook doc/generated-docs $<
+
+# Generate BLE gdbus code
+gdbus_generated_ble = src/gdbus-generated-ble.c src/gdbus-generated-ble.h
+
+$(gdbus_generated_ble): src/pico-ble-gdbus.xml
+	$(AM_V_GEN) \
+	$(GDBUS_CODEGEN) --interface-prefix org.bluez --generate-c-code src/gdbus-generated-ble --c-generate-object-manager --generate-docbook doc/generated-docs $<
+
+
 
 # Pairing executable
 pico_pair_SOURCES = \
@@ -44,6 +53,8 @@ pico_test_LDFLAGS = $(AM_LDFLAGS) $(MODULES_LDFLAGS) @PICO_LIBS@ @PICOBT_LIBS@ @
 
 # Continuous authenticaton service
 pico_continuous_SOURCES = \
+	$(gdbus_generated_cont) \
+	$(gdbus_generated_ble) \
 	src/pico-continuous.c \
 	src/processstore.c \
 	src/auththread.c \
@@ -53,7 +64,7 @@ pico_continuous_SOURCES = \
 	src/service.c \
 	src/servicebtc.c \
 	src/servicervp.c \
-	src/gdbus-generated.c \
+	src/serviceble.c \
 	src/processstore.h \
 	src/auththread.h \
 	src/beaconthread.h \
@@ -63,15 +74,15 @@ pico_continuous_SOURCES = \
 	src/service_private.h \
 	src/servicebtc.h \
 	src/servicervp.h \
-	src/gdbus-generated.h \
+	src/serviceble.h \
 	$(CORE_SRC)
 
-pico_continuous_CFLAGS = $(AM_CFLAGS) @PICO_CFLAGS@ @PICOBT_CFLAGS@ @GLIB_CFLAGS@
-pico_continuous_LDFLAGS = $(AM_LDFLAGS) $(MODULES_LDFLAGS) @PICO_LIBS@ @PICOBT_LIBS@ @GLIB_LIBS@
+pico_continuous_CFLAGS = $(AM_CFLAGS) @PICO_CFLAGS@ @PICOBT_CFLAGS@ @GLIB_CFLAGS@ @DBUSGLIB_CFLAGS@
+pico_continuous_LDFLAGS = $(AM_LDFLAGS) $(MODULES_LDFLAGS) @PICO_LIBS@ @PICOBT_LIBS@ @GLIB_LIBS@ @DBUSGLIB_LIBS@
 
 # PAM module
 pam_pico_la_SOURCES = \
-	$(gdbus_generated) \
+	$(gdbus_generated_cont) \
 	src/pam_pico.c \
 	$(CORE_SRC)
 
@@ -89,7 +100,7 @@ lib_pam_test_la_CFLAGS  = $(AM_CFLAGS) @PICO_CFLAGS@ @PICOBT_CFLAGS@ @GLIB_CFLAG
 lib_pam_test_la_LDFLAGS = $(AM_LDFLAGS) 
 
 lib_service_test_la_SOURCES = \
-	$(gdbus_generated) \
+	$(gdbus_generated_cont) \
 	src/pico-continuous.c \
 	src/processstore.c \
 	src/auththread.c \

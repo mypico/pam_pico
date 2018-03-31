@@ -235,6 +235,9 @@ bool authconfig_read_json(AuthConfig * authconfig, char const * json) {
 				if (strcmp(string, "btc") == 0) {
 					authconfig->channeltype = AUTHCHANNEL_BTC;
 				}
+				if (strcmp(string, "ble") == 0) {
+					authconfig->channeltype = AUTHCHANNEL_BLE;
+				}
 			}
 
 			type = json_get_type(config, "beacons");

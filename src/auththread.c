@@ -71,6 +71,7 @@
 #include "service.h"
 #include "servicebtc.h"
 #include "servicervp.h"
+#include "serviceble.h"
 #include "auththread.h"
 
 // Defines
@@ -489,6 +490,7 @@ void auththread_start_auth(AuthThread * auththread) {
 	char const * urlstring;
 	ServiceRvp * servicervp;
 	ServiceBtc * servicebtc;
+	ServiceBle * serviceble;
 	Buffer * pubfilename;
 	Buffer * privfilename;
 	Buffer * usersfilename;
@@ -531,6 +533,10 @@ void auththread_start_auth(AuthThread * auththread) {
 		url = authconfig_get_rvpurl(auththread->authconfig);
 		urlstring = buffer_get_buffer(url);
 		servicervp_set_urlprefix(servicervp, urlstring);
+		break;
+	case AUTHCHANNEL_BLE:
+		serviceble = serviceble_new();
+		auththread->service = (Service *)serviceble;
 		break;
 	default:
 		LOG(LOG_ERR, "No channel type selected");
