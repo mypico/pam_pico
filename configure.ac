@@ -24,6 +24,8 @@ fi
 
 AC_CHECK_HEADERS([sys/fsuid.h])
 AC_CHECK_FUNCS([setfsuid])
+AC_CHECK_HEADERS([security/_pam_types.h])
+AC_CHECK_HEADERS([security/pam_types.h])
 
 AC_CHECK_HEADERS_ONCE([security/pam_appl.h])
 # On Solaris at least, <security/pam_modules.h> requires <security/pam_appl.h>
