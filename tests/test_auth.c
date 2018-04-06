@@ -28,6 +28,8 @@
  *
  */
 
+#include <security/pam_appl.h>
+
 #include <check.h>
 #include <stdbool.h>
 #include <pico/shared.h>
@@ -321,18 +323,19 @@ START_TEST(test_dbus_call_order) {
 }
 END_TEST
 
+static DBusConnection * test_dbus_bus_get_fail_no_bus_first(DBusBusType type, DBusError * error) {
+	DBusConnection * connection = NULL;
+	ck_assert(error);
+	if (stage >= STAGE_REPLIED_TO_FIRST) {
+		connection = connection_used;
+	}
+	return connection;
+}
+
 START_TEST(test_dbus_no_bus_first) {
 	set_default_auth_success();
 
-	DBusConnection * test_dbus_bus_get_fail(DBusBusType type, DBusError * error) {
-		DBusConnection * connection = NULL;
-		ck_assert(error);
-		if (stage >= STAGE_REPLIED_TO_FIRST) {
-			connection = connection_used;
-		}
-		return connection;
-	}
-	dbus_funcs.dbus_bus_get = test_dbus_bus_get_fail;
+	dbus_funcs.dbus_bus_get = test_dbus_bus_get_fail_no_bus_first;
 
 	result = pam_sm_authenticate(pam_handle, 0, argc, argv);
 	ck_assert_msg(error_freed, "DBUS error structure not freed");
@@ -340,19 +343,20 @@ START_TEST(test_dbus_no_bus_first) {
 	ck_assert(stage < STAGE_REPLIED_TO_FIRST);
 }
 END_TEST
+
+static DBusConnection * test_dbus_bus_get_fail_no_bus_second(DBusBusType type, DBusError * error) {
+	DBusConnection * connection = NULL;
+	ck_assert(error);
+	if (stage < STAGE_REPLIED_TO_FIRST) {
+		connection = connection_used;
+	}
+	return connection;
+}
 
 START_TEST(test_dbus_no_bus_second) {
 	set_default_auth_success();
 
-	DBusConnection * test_dbus_bus_get_fail(DBusBusType type, DBusError * error) {
-		DBusConnection * connection = NULL;
-		ck_assert(error);
-		if (stage < STAGE_REPLIED_TO_FIRST) {
-			connection = connection_used;
-		}
-		return connection;
-	}
-	dbus_funcs.dbus_bus_get = test_dbus_bus_get_fail;
+	dbus_funcs.dbus_bus_get = test_dbus_bus_get_fail_no_bus_second;
 
 	result = pam_sm_authenticate(pam_handle, 0, argc, argv);
 	ck_assert_msg(error_freed, "DBUS error structure not freed");
@@ -361,22 +365,22 @@ START_TEST(test_dbus_no_bus_second) {
 }
 END_TEST
 
+static DBusMessage * test_dbus_message_new_method_call_fail_no_method_first(const char * bus_name, const char * path, const char * iface, const char * method) {
+	DBusMessage * message;
+	if (stage < STAGE_REPLIED_TO_FIRST) {
+		message = NULL;
+	}
+	else {
+		message = message_second;
+	}
+
+	return message;
+}
+
 START_TEST(test_dbus_no_method_first) {
 	set_default_auth_success();
 
-	DBusMessage * test_dbus_message_new_method_call_fail(const char * bus_name, const char * path, const char * iface, const char * method) {
-		DBusMessage * message;
-		if (stage < STAGE_REPLIED_TO_FIRST) {
-			message = NULL;
-		}
-		else {
-			message = message_second;
-		}
-
-		return message;
-	}
-
-	dbus_funcs.dbus_message_new_method_call = test_dbus_message_new_method_call_fail;
+	dbus_funcs.dbus_message_new_method_call = test_dbus_message_new_method_call_fail_no_method_first;
 
 	result = pam_sm_authenticate(pam_handle, 0, argc, argv);
 	ck_assert_msg(error_freed, "DBUS error structure not freed");
@@ -385,22 +389,22 @@ START_TEST(test_dbus_no_method_first) {
 }
 END_TEST
 
+static DBusMessage * test_dbus_message_new_method_call_fail_no_method_second(const char * bus_name, const char * path, const char * iface, const char * method) {
+	DBusMessage * message;
+	if (stage < STAGE_REPLIED_TO_FIRST) {
+		message = message_first;
+	}
+	else {
+		message = NULL;
+	}
+
+	return message;
+}
+
 START_TEST(test_dbus_no_method_second) {
 	set_default_auth_success();
 
-	DBusMessage * test_dbus_message_new_method_call_fail(const char * bus_name, const char * path, const char * iface, const char * method) {
-		DBusMessage * message;
-		if (stage < STAGE_REPLIED_TO_FIRST) {
-			message = message_first;
-		}
-		else {
-			message = NULL;
-		}
-
-		return message;
-	}
-
-	dbus_funcs.dbus_message_new_method_call = test_dbus_message_new_method_call_fail;
+	dbus_funcs.dbus_message_new_method_call = test_dbus_message_new_method_call_fail_no_method_second;
 
 	result = pam_sm_authenticate(pam_handle, 0, argc, argv);
 	ck_assert_msg(error_freed, "DBUS error structure not freed");
@@ -409,25 +413,26 @@ START_TEST(test_dbus_no_method_second) {
 }
 END_TEST
 
+static DBusMessage * test_dbus_connection_send_with_reply_and_block_fail_first(DBusConnection * connection, DBusMessage * message, int timeout_milliseconds, DBusError * error) {
+	DBusMessage * reply_back;
+
+	if (message == message_first) {
+		stage = STAGE_REPLIED_TO_FIRST;
+		reply_back = NULL;
+	}
+
+	if (message == message_second) {
+		stage = STAGE_REPLIED_TO_SECOND;
+		reply_back = reply;
+	}
+
+	return reply_back;
+}
+
 START_TEST(test_dbus_send_fail_first) {
 	set_default_auth_success();
 
-	DBusMessage * test_dbus_connection_send_with_reply_and_block_fail(DBusConnection * connection, DBusMessage * message, int timeout_milliseconds, DBusError * error) {
-		DBusMessage * reply_back;
-
-		if (message == message_first) {
-			stage = STAGE_REPLIED_TO_FIRST;
-			reply_back = NULL;
-		}
-
-		if (message == message_second) {
-			stage = STAGE_REPLIED_TO_SECOND;
-			reply_back = reply;
-		}
-
-		return reply_back;
-	}
-	dbus_funcs.dbus_connection_send_with_reply_and_block = test_dbus_connection_send_with_reply_and_block_fail;
+	dbus_funcs.dbus_connection_send_with_reply_and_block = test_dbus_connection_send_with_reply_and_block_fail_first;
 
 	result = pam_sm_authenticate(pam_handle, 0, argc, argv);
 	ck_assert_msg(error_freed, "DBUS error structure not freed");
@@ -436,25 +441,26 @@ START_TEST(test_dbus_send_fail_first) {
 }
 END_TEST
 
+static DBusMessage * test_dbus_connection_send_with_reply_and_block_fail_second(DBusConnection * connection, DBusMessage * message, int timeout_milliseconds, DBusError * error) {
+	DBusMessage * reply_back = NULL;
+
+	if (message == message_first) {
+		stage = STAGE_REPLIED_TO_FIRST;
+		reply_back = reply;
+	}
+
+	if (message == message_second) {
+		stage = STAGE_REPLIED_TO_SECOND;
+		reply_back = NULL;
+	}
+
+	return reply_back;
+}
+
 START_TEST(test_dbus_send_fail_second) {
 	set_default_auth_success();
 
-	DBusMessage * test_dbus_connection_send_with_reply_and_block_fail(DBusConnection * connection, DBusMessage * message, int timeout_milliseconds, DBusError * error) {
-		DBusMessage * reply_back = NULL;
-
-		if (message == message_first) {
-			stage = STAGE_REPLIED_TO_FIRST;
-			reply_back = reply;
-		}
-
-		if (message == message_second) {
-			stage = STAGE_REPLIED_TO_SECOND;
-			reply_back = NULL;
-		}
-
-		return reply_back;
-	}
-	dbus_funcs.dbus_connection_send_with_reply_and_block = test_dbus_connection_send_with_reply_and_block_fail;
+	dbus_funcs.dbus_connection_send_with_reply_and_block = test_dbus_connection_send_with_reply_and_block_fail_second;
 
 	result = pam_sm_authenticate(pam_handle, 0, argc, argv);
 	ck_assert_msg(error_freed, "DBUS error structure not freed");
@@ -463,22 +469,23 @@ START_TEST(test_dbus_send_fail_second) {
 }
 END_TEST
 
+static dbus_bool_t test_dbus_set_error_from_message_fail_first(DBusError * error, DBusMessage * message) {
+	dbus_bool_t result = false;
+
+	if (stage < STAGE_REPLIED_TO_SECOND) {
+		result = true;
+	}
+	ck_assert(error);
+	error->name = "error name";
+	error->message = "error message";
+
+	return result;
+}
+
 START_TEST(test_dbus_error_first) {
 	set_default_auth_success();
 
-	dbus_bool_t test_dbus_set_error_from_message_fail(DBusError * error, DBusMessage * message) {
-		dbus_bool_t result = false;
-
-		if (stage < STAGE_REPLIED_TO_SECOND) {
-			result = true;
-		}
-		ck_assert(error);
-		error->name = "error name";
-		error->message = "error message";
-
-		return result;
-	}
-	dbus_funcs.dbus_set_error_from_message = test_dbus_set_error_from_message_fail;
+	dbus_funcs.dbus_set_error_from_message = test_dbus_set_error_from_message_fail_first;
 
 	result = pam_sm_authenticate(pam_handle, 0, argc, argv);
 	ck_assert_msg(error_freed, "DBUS error structure not freed");
@@ -487,22 +494,23 @@ START_TEST(test_dbus_error_first) {
 }
 END_TEST
 
+static dbus_bool_t test_dbus_set_error_from_message_fail_second(DBusError * error, DBusMessage * message) {
+	dbus_bool_t result = false;
+
+	if (stage >= STAGE_REPLIED_TO_SECOND) {
+		result = true;
+	}
+	ck_assert(error);
+	error->name = "error name";
+	error->message = "error message";
+
+	return result;
+}
+
 START_TEST(test_dbus_error_second) {
 	set_default_auth_success();
 
-	dbus_bool_t test_dbus_set_error_from_message_fail(DBusError * error, DBusMessage * message) {
-		dbus_bool_t result = false;
-
-		if (stage >= STAGE_REPLIED_TO_SECOND) {
-			result = true;
-		}
-		ck_assert(error);
-		error->name = "error name";
-		error->message = "error message";
-
-		return result;
-	}
-	dbus_funcs.dbus_set_error_from_message = test_dbus_set_error_from_message_fail;
+	dbus_funcs.dbus_set_error_from_message = test_dbus_set_error_from_message_fail_second;
 
 	result = pam_sm_authenticate(pam_handle, 0, argc, argv);
 	ck_assert_msg(error_freed, "DBUS error structure not freed");
@@ -511,46 +519,47 @@ START_TEST(test_dbus_error_second) {
 }
 END_TEST
 
+static dbus_bool_t test_dbus_message_get_args_fail_first(DBusMessage * message, DBusError * error, int first_arg_type, va_list args) {
+	int arg_type = -1;
+	bool * success_ptr = NULL;
+	char ** username_ptr = NULL;
+	char ** password_ptr = NULL;
+	dbus_bool_t result = false;
+
+	if (stage < STAGE_ITER_APPEND_SECOND) {
+		result = false;
+	}
+	else {
+		ck_assert(first_arg_type == DBUS_TYPE_STRING);
+		username_ptr = va_arg(args, char**);
+		ck_assert(username_ptr);
+		*username_ptr = username;
+
+		arg_type = va_arg(args, int);
+		ck_assert(arg_type == DBUS_TYPE_STRING);
+		password_ptr = va_arg(args, char**);
+		ck_assert(password_ptr);
+		*password_ptr = password;
+
+		arg_type = va_arg(args, int);
+		ck_assert(arg_type == DBUS_TYPE_BOOLEAN);
+		success_ptr = va_arg(args, bool*);
+		ck_assert(success_ptr);
+		*success_ptr = true;
+
+		arg_type = va_arg(args, int);
+		ck_assert(arg_type == DBUS_TYPE_INVALID);
+
+		result = true;
+	}
+
+	return result;
+}
+
 START_TEST(test_dbus_get_args_first) {
 	set_default_auth_success();
 
-	dbus_bool_t test_dbus_message_get_args_fail(DBusMessage * message, DBusError * error, int first_arg_type, va_list args) {
-		int arg_type = -1;
-		bool * success_ptr = NULL;
-		char ** username_ptr = NULL;
-		char ** password_ptr = NULL;
-		dbus_bool_t result = false;
-
-		if (stage < STAGE_ITER_APPEND_SECOND) {
-			result = false;
-		}
-		else {
-			ck_assert(first_arg_type == DBUS_TYPE_STRING);
-			username_ptr = va_arg(args, char**);
-			ck_assert(username_ptr);
-			*username_ptr = username;
-
-			arg_type = va_arg(args, int);
-			ck_assert(arg_type == DBUS_TYPE_STRING);
-			password_ptr = va_arg(args, char**);
-			ck_assert(password_ptr);
-			*password_ptr = password;
-
-			arg_type = va_arg(args, int);
-			ck_assert(arg_type == DBUS_TYPE_BOOLEAN);
-			success_ptr = va_arg(args, bool*);
-			ck_assert(success_ptr);
-			*success_ptr = true;
-
-			arg_type = va_arg(args, int);
-			ck_assert(arg_type == DBUS_TYPE_INVALID);
-
-			result = true;
-		}
-
-		return result;
-	}
-	dbus_funcs.dbus_message_get_args = test_dbus_message_get_args_fail;
+	dbus_funcs.dbus_message_get_args = test_dbus_message_get_args_fail_first;
 
 	result = pam_sm_authenticate(pam_handle, 0, argc, argv);
 	ck_assert_msg(error_freed, "DBUS error structure not freed");
@@ -559,46 +568,47 @@ START_TEST(test_dbus_get_args_first) {
 }
 END_TEST
 
+static dbus_bool_t test_dbus_message_get_args_fail_second(DBusMessage * message, DBusError * error, int first_arg_type, va_list args) {
+	int arg_type = -1;
+	int * handle_ptr = NULL;
+	bool * success_ptr = NULL;
+	char ** code_ptr = NULL;
+	dbus_bool_t result = false;
+
+	if (stage < STAGE_ITER_APPEND_SECOND) {
+		ck_assert(first_arg_type == DBUS_TYPE_INT32);
+		handle_ptr = va_arg(args, int*);
+		ck_assert(handle_ptr);
+		*handle_ptr = handle_used;
+
+		arg_type = va_arg(args, int);
+		ck_assert(arg_type == DBUS_TYPE_STRING);
+		code_ptr = va_arg(args, char**);
+		ck_assert(code_ptr);
+		*code_ptr = "QR code";
+
+		arg_type = va_arg(args, int);
+		ck_assert(arg_type == DBUS_TYPE_BOOLEAN);
+		success_ptr = va_arg(args, bool*);
+		ck_assert(success_ptr);
+		*success_ptr = true;
+
+		arg_type = va_arg(args, int);
+		ck_assert(arg_type == DBUS_TYPE_INVALID);
+
+		result = true;
+	}
+	else {
+		result = false;
+	}
+
+	return result;
+}
+
 START_TEST(test_dbus_get_args_second) {
 	set_default_auth_success();
 
-	dbus_bool_t test_dbus_message_get_args_fail(DBusMessage * message, DBusError * error, int first_arg_type, va_list args) {
-		int arg_type = -1;
-		int * handle_ptr = NULL;
-		bool * success_ptr = NULL;
-		char ** code_ptr = NULL;
-		dbus_bool_t result = false;
-
-		if (stage < STAGE_ITER_APPEND_SECOND) {
-			ck_assert(first_arg_type == DBUS_TYPE_INT32);
-			handle_ptr = va_arg(args, int*);
-			ck_assert(handle_ptr);
-			*handle_ptr = handle_used;
-
-			arg_type = va_arg(args, int);
-			ck_assert(arg_type == DBUS_TYPE_STRING);
-			code_ptr = va_arg(args, char**);
-			ck_assert(code_ptr);
-			*code_ptr = "QR code";
-
-			arg_type = va_arg(args, int);
-			ck_assert(arg_type == DBUS_TYPE_BOOLEAN);
-			success_ptr = va_arg(args, bool*);
-			ck_assert(success_ptr);
-			*success_ptr = true;
-
-			arg_type = va_arg(args, int);
-			ck_assert(arg_type == DBUS_TYPE_INVALID);
-
-			result = true;
-		}
-		else {
-			result = false;
-		}
-
-		return result;
-	}
-	dbus_funcs.dbus_message_get_args = test_dbus_message_get_args_fail;
+	dbus_funcs.dbus_message_get_args = test_dbus_message_get_args_fail_second;
 
 	result = pam_sm_authenticate(pam_handle, 0, argc, argv);
 	ck_assert_msg(error_freed, "DBUS error structure not freed");
