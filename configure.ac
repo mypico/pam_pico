@@ -41,13 +41,13 @@ AS_IF([test "x$ac_cv_header_security_pam_modules_h" = "xno" \
   AC_MSG_ERROR([Unable to find the PAM library or the PAM header files])
 ])
 
-PKG_CHECK_MODULES([PICO], [libpico-1 >= 0.0.1])
-PKG_CHECK_MODULES([PICOBT], [libpicobt, bluez])
+PKG_CHECK_MODULES([PICO], [libpico-1 >= 0.0.1, libcrypto, libcurl])
+PKG_CHECK_MODULES([PICOBT], [libpicobt, bluez], [HAVE_BLUETOOTH=1], [HAVE_BLUETOOTH=0])
 PKG_CHECK_MODULES([GLIB], [gio-unix-2.0, glib-2.0, libsoup-2.4])
 PKG_CHECK_MODULES([DBUSGLIB], [dbus-glib-1])
-PKG_CHECK_MODULES([GTK], [gtk+-3.0])
+PKG_CHECK_MODULES([GTK], [gtk+-3.0], [HAVE_GTK=1], [HAVE_GTK=0])
 PKG_CHECK_MODULES([QRENCODE], [libqrencode])
-PKG_CHECK_MODULES([URLDISPATCHER], [url-dispatcher-1])
+PKG_CHECK_MODULES([URLDISPATCHER], [url-dispatcher-1], [HAVE_URLDISPATCH=1], [HAVE_URLDISPATCH=0])
 
 # Checks for the Check libraries. See https://libcheck.github.io/check/
 PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
@@ -58,6 +58,20 @@ AC_PATH_PROG(GDBUS_CODEGEN, [gdbus-codegen], [])
 AS_IF([test "x$GDBUS_CODEGEN" = "x"], [
 	AC_MSG_ERROR([Could not find gdbus-codegen])
 ])
+
+# Check whether the LD -z,nodelete linker flag is available
+AC_MSG_CHECKING([for -z,nodelete linker flag])
+ax_check_save_flags=$LDFLAGS
+LDFLAGS="$LDFLAGS -Wl,-z,nodelete"
+AC_LINK_IFELSE(
+      [AC_LANG_PROGRAM([], [])],
+      [AC_DEFINE([LDNODELETE], [-Wl,-z,nodelete],
+		 [Define if -z,nodelete linker flag is available])
+      AC_MSG_RESULT([yes])],
+      [AC_DEFINE([LDNODELETE], [],
+		 [Avoid using -z,nodelete linker flag])
+      AC_MSG_RESULT([no])])
+LDFLAGS=$ax_check_save_flags
 
 AC_MSG_CHECKING([whether certain PAM functions require const arguments])
 AC_LANG_PUSH(C)
