@@ -58,7 +58,8 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <malloc.h>
+//#include <malloc.h>
+#include <stdlib.h>
 #include <syslog.h>
 #include "pico/pico.h"
 #include "pico/keyauth.h"
@@ -488,7 +489,9 @@ void auththread_start_auth(AuthThread * auththread) {
 	Buffer const * url;
 	char const * urlstring;
 	ServiceRvp * servicervp;
+#ifdef HAVE_LIBBLUETOOTH
 	ServiceBtc * servicebtc;
+#endif
 	Buffer * pubfilename;
 	Buffer * privfilename;
 	Buffer * usersfilename;
@@ -522,8 +525,18 @@ void auththread_start_auth(AuthThread * auththread) {
 
 	switch (channeltype) {
 	case AUTHCHANNEL_BTC:
+#ifdef HAVE_LIBBLUETOOTH
 		servicebtc = servicebtc_new();
 		auththread->service = (Service *)servicebtc;
+
+#else
+		LOG(LOG_ERR, "Bluetooth Classic channel not supported");
+		LOG(LOG_ERR, "To use it you must compile with the HAVE_LIBBLUETOOTH flag set");
+		LOG(LOG_ERR, "Defaulting to RVP channel");
+		// Default to RVP if no channel is selected
+		auththread->service = (Service *)servicervp_new();
+
+#endif
 		break;
 	case AUTHCHANNEL_RVP:
 		servicervp = servicervp_new();

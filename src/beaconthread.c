@@ -55,7 +55,8 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <malloc.h>
+//#include <malloc.h>
+#include <stdlib.h>
 #include <syslog.h>
 #include "pico/base64.h"
 #include "pico/cryptosupport.h"

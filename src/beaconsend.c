@@ -62,11 +62,14 @@
 #include <errno.h>
 #include <unistd.h>
 #include <sys/socket.h>
+
+#ifdef HAVE_LIBBLUETOOTH
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/sdp.h>
 #include <bluetooth/sdp_lib.h>
+#endif
 
 #include "pico/pico.h"
 #include "pico/debug.h"
@@ -132,9 +135,11 @@ typedef enum _BEACONSENDSTATE {
  *
  */
 struct _BeaconSend {
+#ifdef HAVE_LIBBLUETOOTH
 	uuid_t svc_uuid;
 	bdaddr_t device;
 	sdp_session_t * session;
+#endif
 	BEACONSENDSTATE state;
 	int connections;
 	Buffer * code;
@@ -144,10 +149,12 @@ struct _BeaconSend {
 
 // Function prototypes
 
+#ifdef HAVE_LIBBLUETOOTH
 static void report_error(GError ** error, char const * hint);
 static void beaconsend_write_connect(GObject *connection, GAsyncResult *res, gpointer user_data);
-static gboolean beaconsend_sdp_search(gpointer user_data);
 static gboolean beaconsend_sdp_connect(GIOChannel * iochannel, GIOCondition condition, gpointer user_data);
+#endif
+static gboolean beaconsend_sdp_search(gpointer user_data);
 static void beaconsend_finished(BeaconSend * beaconsend);
 
 // Function definitions
@@ -159,12 +166,17 @@ static void beaconsend_finished(BeaconSend * beaconsend);
  */
 BeaconSend * beaconsend_new() {
 	BeaconSend * beaconsend;
+#ifdef HAVE_LIBBLUETOOTH
 	uint8_t svc_uuid_int[] = { PICO_SERVICE_UUID };
+#endif
 
 	beaconsend = CALLOC(sizeof(BeaconSend), 1);
+#ifdef HAVE_LIBBLUETOOTH
+	sdp_uuid128_create(& beaconsend->svc_uuid, & svc_uuid_int);
+	beaconsend->session = NULL;
+#endif
 	beaconsend->state = BEACONSENDSTATE_INVALID;
 	beaconsend->connections = 0;
-	sdp_uuid128_create(& beaconsend->svc_uuid, & svc_uuid_int);
 	beaconsend->code = buffer_new(0);
 	beaconsend->finish_callback = NULL;
 	beaconsend->user_data = NULL;
@@ -199,8 +211,12 @@ void beaconsend_delete(BeaconSend * beaconsend) {
 bool beaconsend_set_device(BeaconSend * beaconsend, char const * const device) {
 	int result;
 
+#ifdef HAVE_LIBBLUETOOTH
 	// Set up the device MAC
 	result = str2ba(device, & beaconsend->device);
+#else
+	result = 0;
+#endif
 
 	return (result == 0);
 }
@@ -214,6 +230,7 @@ bool beaconsend_set_device(BeaconSend * beaconsend, char const * const device) {
  * @param error the error structure to check and report if it exists
  * @param hint a human-readable hint that will be output alongside the error
  */
+#ifdef HAVE_LIBBLUETOOTH
 static void report_error(GError ** error, char const * hint) {
 	if (*error) {
 		LOG(LOG_ERR, "Error %s: %s", hint, (*error)->message);
@@ -221,6 +238,7 @@ static void report_error(GError ** error, char const * hint) {
 		*error = NULL;
 	}
 }
+#endif
 
 /**
  * Event callback used as part of the beacon send process. A standard event
@@ -245,6 +263,7 @@ static void report_error(GError ** error, char const * hint) {
  */
 static gboolean beaconsend_sdp_search(gpointer user_data) {
 	BeaconSend * beaconsend = (BeaconSend *)user_data;
+#ifdef HAVE_LIBBLUETOOTH
 	int sdp_socket;
 	uint32_t priority;
 	GIOChannel * iochannel;
@@ -274,6 +293,11 @@ static gboolean beaconsend_sdp_search(gpointer user_data) {
 			beaconsend->state = BEACONSENDSTATE_READY;
 		}
 	}
+#else
+	if ((beaconsend->state == BEACONSENDSTATE_STARTING) || (beaconsend->state == BEACONSENDSTATE_READY)) {
+		beaconsend->state = BEACONSENDSTATE_SENDING;
+	}
+#endif
 
 	if ((beaconsend->connections == 0) && (beaconsend->state == BEACONSENDSTATE_STOPPING)) {
 		beaconsend_finished(beaconsend);
@@ -305,6 +329,7 @@ static gboolean beaconsend_sdp_search(gpointer user_data) {
  * @param user_data Data sent to the callback, in this case a BeaconSend
  *        structure.
  */
+#ifdef HAVE_LIBBLUETOOTH
 static gboolean beaconsend_sdp_connect(GIOChannel * iochannel, GIOCondition condition, gpointer user_data) {
 	BeaconSend * beaconsend = (BeaconSend *)user_data;
 	sdp_list_t * search_list;
@@ -394,6 +419,7 @@ static gboolean beaconsend_sdp_connect(GIOChannel * iochannel, GIOCondition cond
 
 	return FALSE;
 }
+#endif
 
 /**
  * Event callback used as part of the beacon send process. A standard event
@@ -417,6 +443,7 @@ static gboolean beaconsend_sdp_connect(GIOChannel * iochannel, GIOCondition cond
  * @param user_data Data sent to the callback, in this case a BeaconSend
  *        structure.
  */
+#ifdef HAVE_LIBBLUETOOTH
 static void beaconsend_write_connect(GObject *connection, GAsyncResult *res, gpointer user_data) {
 	BeaconSend * beaconsend = (BeaconSend *)user_data;
 	gboolean result;
@@ -459,6 +486,7 @@ static void beaconsend_write_connect(GObject *connection, GAsyncResult *res, gpo
 		beaconsend->state = BEACONSENDSTATE_READY;
 	}
 }
+#endif
 
 /**
  * Start the process of sending a beacon to a device.
@@ -472,8 +500,11 @@ void beaconsend_start(BeaconSend * beaconsend) {
 	bool result;
 	beaconsend->state = BEACONSENDSTATE_STARTING;
 
+#ifdef HAVE_LIBBLUETOOTH
 	result = beaconsend_sdp_search(beaconsend);
-
+#else
+	result = true;
+#endif
 	if (result) {
 		g_timeout_add (BEACONSEND_GAP, beaconsend_sdp_search, beaconsend);
 	}

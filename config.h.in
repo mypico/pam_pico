@@ -12,6 +12,12 @@
 /* Define to 1 if you have the <security/pam_appl.h> header file. */
 #undef HAVE_SECURITY_PAM_APPL_H
 
+/* Define to 1 if you have the <security/pam_types.h> header file. */
+#undef HAVE_SECURITY_PAM_TYPES_H
+
+/* Define to 1 if you have the <security/_pam_types.h> header file. */
+#undef HAVE_SECURITY__PAM_TYPES_H
+
 /* Define to 1 if you have the `setfsuid' function. */
 #undef HAVE_SETFSUID
 
@@ -38,6 +44,9 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
+
+/* Avoid using -z,nodelete linker flag */
+#undef LDNODELETE
 
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR

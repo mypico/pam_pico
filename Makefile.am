@@ -8,7 +8,8 @@ DISTCHECK_CONFIGURE_FLAGS = \
 
 pamdir = $(libdir)/security
 
-bin_PROGRAMS      = pico-pair pico-continuous pico-test
+#bin_PROGRAMS      = pico-pair pico-continuous pico-test
+bin_PROGRAMS      = pico-continuous
 pam_LTLIBRARIES   = pam_pico.la 
 noinst_LTLIBRARIES   = lib_pam_test.la lib_service_test.la lib_mockpam.la lib_mockbt.la lib_mockdbus.la
 
@@ -44,6 +45,7 @@ pico_test_LDFLAGS = $(AM_LDFLAGS) $(MODULES_LDFLAGS) @PICO_LIBS@ @PICOBT_LIBS@ @
 
 # Continuous authenticaton service
 pico_continuous_SOURCES = \
+	$(gdbus_generated) \
 	src/pico-continuous.c \
 	src/processstore.c \
 	src/auththread.c \
@@ -53,7 +55,6 @@ pico_continuous_SOURCES = \
 	src/service.c \
 	src/servicebtc.c \
 	src/servicervp.c \
-	src/gdbus-generated.c \
 	src/processstore.h \
 	src/auththread.h \
 	src/beaconthread.h \
@@ -77,7 +78,7 @@ pam_pico_la_SOURCES = \
 
 pam_pico_la_LIBADD  = -lpam @PICO_LIBS@ @PICOBT_LIBS@ @DBUSGLIB_LIBS@ @GLIB_LIBS@
 pam_pico_la_CFLAGS  = -fPIC $(AM_CFLAGS) @PICO_CFLAGS@ @PICOBT_CFLAGS@ @GLIB_CFLAGS@ @DBUSGLIB_CFLAGS@
-pam_pico_la_LDFLAGS = -avoid-version -module -Wl,-z,nodelete $(AM_LDFLAGS) $(MODULES_LDFLAGS) -export-symbols-regex "pam_sm_(setcred|open_session|authenticate)"
+pam_pico_la_LDFLAGS = -avoid-version -module $(LDNODELETE) $(AM_LDFLAGS) $(MODULES_LDFLAGS) -export-symbols-regex "pam_sm_(setcred|open_session|authenticate)"
 
 # Tests
 lib_pam_test_la_SOURCES = \

@@ -107,7 +107,7 @@
 #include "pico/messageservicereauth.h"
 #include "pico/channel_bt.h"
 #include "pico/debug.h"
-#include "picobt/btmain.h"
+//#include "picobt/btmain.h"
 
 #include "log.h"
 #include "processstore.h"
@@ -312,7 +312,9 @@ gint main(gint argc, gchar * argv[]) {
 
 	// Initialise Bluetooth
 	syslog(LOG_INFO, "Initialising Bluetooth\n");
+#ifdef HAVE_LIBBLUETOOTH
 	bt_init();
+#endif
 
 	syslog(LOG_INFO, "Requesting to own bus\n");
 	id = g_bus_own_name(G_BUS_TYPE_SYSTEM, "uk.ac.cam.cl.pico.service", G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT | G_BUS_NAME_OWNER_FLAGS_REPLACE, on_bus_acquired, on_name_acquired, on_name_lost, (void *)processstoredata, NULL);
@@ -334,7 +336,9 @@ gint main(gint argc, gchar * argv[]) {
 
 	// Deinitialise Bluetooth
 	syslog(LOG_INFO, "Deinit Bluetooth\n");
+#ifdef HAVE_LIBBLUETOOTH
 	bt_exit();
+#endif
 
 	syslog(LOG_INFO, "The End\n");
 

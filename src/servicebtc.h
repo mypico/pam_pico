@@ -45,6 +45,8 @@
 #ifndef __SERVICEBTC_H
 #define __SERVICEBTC_H (1)
 
+#ifdef HAVE_LIBBLUETOOTH
+
 #include "pico/fsmservice.h"
 
 // Defines
@@ -62,6 +64,8 @@ void servicebtc_start(ServiceBtc * servicebtc, Shared * shared, Users const * us
 void servicebtc_stop(ServiceBtc * servicebtc);
 
 // Function definitions
+
+#endif // ifdef HAVE_LIBBLUETOOTH
 
 #endif
 

@@ -58,7 +58,7 @@
 #include "pico/debug.h"
 #include "pico/buffer.h"
 #include "pico/continuous.h"
-#include <picobt/devicelist.h>
+//#include <picobt/devicelist.h>
 
 #include "authconfig.h"
 #include "gdbus-generated.h"

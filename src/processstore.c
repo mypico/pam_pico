@@ -77,8 +77,8 @@
 #include "pico/messagepicoreauth.h"
 #include "pico/messageservicereauth.h"
 #include "pico/debug.h"
-#include <picobt/bt.h>
-#include <picobt/btmain.h>
+//#include <picobt/bt.h>
+//#include <picobt/btmain.h>
 
 #include "log.h"
 #include "processstore.h"

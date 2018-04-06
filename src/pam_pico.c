@@ -521,7 +521,7 @@ typedef struct _ExternalConfig {
 // Function prototypes
 
 static int converse(pam_handle_t *pamh, int nargs, PAM_CONST struct pam_message **message, struct pam_response **response);
-void prompt(pam_handle_t *pamh, int style, PAM_CONST char *prompt);
+void prompt(pam_handle_t *pamh, int style, char *prompt);
 void * thread_input(void * t);
 char * convert_text_to_qr_code(const char * qrtext, QRTYPE mode, bool requireInput);
 bool pam_auth(pam_handle_t *pamh, ExternalConfig * externalconfig, QRTYPE mode, bool requestInput);
@@ -572,7 +572,7 @@ static int converse(pam_handle_t *pamh, int nargs, PAM_CONST struct pam_message 
  * @param style One of either PAM_PROMPT_ECHO_OFF or PAM_PROMPT_TEXT_INFO
  * @param prompt The message text to display to the user
  */
-void prompt(pam_handle_t *pamh, int style, PAM_CONST char *prompt) {
+void prompt(pam_handle_t *pamh, int style, char *prompt) {
 	// Display QR code
 	struct pam_message message;
 	PAM_CONST struct pam_message *msgs = &message;

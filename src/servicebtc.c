@@ -48,6 +48,8 @@
 
 #include "config.h"
 
+#ifdef HAVE_LIBBLUETOOTH
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <syslog.h>
@@ -748,6 +750,8 @@ static int servicebtc_start_listen(ServiceBtc * servicebtc) {
 
 	return channel;
 }
+
+#endif // ifdef HAVE_LIBBLUETOOTH
 
 /** @} addtogroup Service */
 
