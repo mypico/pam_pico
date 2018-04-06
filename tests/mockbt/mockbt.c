@@ -1,4 +1,7 @@
 #include "mockbt.h"
+
+#ifdef HAVE_LIBBLUETOOTH
+
 #include <stdlib.h>
 
 bt_err_t bt_init_default(void) {
@@ -163,4 +166,6 @@ void sdp_list_free(sdp_list_t *list, sdp_free_func_t f) {
 int sdp_get_access_protos(const sdp_record_t *rec, sdp_list_t **protos) {
 	return bt_funcs.sdp_get_access_protos(rec, protos);
 }
+
+#endif // #ifdef HAVE_LIBBLUETOOTH
 

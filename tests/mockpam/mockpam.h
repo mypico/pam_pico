@@ -1,4 +1,5 @@
-#include <security/_pam_types.h>
+//#include <security/_pam_types.h>
+#include <security/pam_types.h>
 
 typedef struct {
 	int (*pam_set_item)(pam_handle_t *pamh, int item_type, const void *item);

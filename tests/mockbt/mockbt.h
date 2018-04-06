@@ -1,3 +1,5 @@
+#ifdef HAVE_LIBBLUETOOTH
+
 #include <picobt/bt.h>
 #include <picobt/devicelist.h>
 #include "../../src/beaconsend.h"
@@ -25,4 +27,6 @@ typedef struct {
 } BTFunctions;
 
 extern BTFunctions bt_funcs;
+
+#endif // #ifdef HAVE_LIBBLUETOOTH
 
