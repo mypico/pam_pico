@@ -69,7 +69,11 @@
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/sdp.h>
 #include <bluetooth/sdp_lib.h>
-#endif
+#endif // #ifdef HAVE_LIBBLUETOOTH
+
+#ifdef HAVE_LIBPICOBT
+#include <picobt/devicelist.h>
+#endif // #ifdef HAVE_LIBPICOBT
 
 #include "pico/pico.h"
 #include "pico/debug.h"

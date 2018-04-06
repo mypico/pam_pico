@@ -51,6 +51,7 @@
 //#include <malloc.h>
 #include <stdlib.h>
 #include <syslog.h>
+#include <string.h>
 #include "pico/pico.h"
 #include "pico/keyauth.h"
 #include "processstore.h"

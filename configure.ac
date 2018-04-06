@@ -3,6 +3,7 @@ AC_INIT([pam-pico], [0.0.3], [Frank.Stajano@cl.cam.ac.uk, David.Llewellyn-Jones@
 AC_CONFIG_SRCDIR([src/pam_pico.c])
 AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build])
+AC_CONFIG_HEADERS(config.h)
 
 AC_USE_SYSTEM_EXTENSIONS
 AM_INIT_AUTOMAKE([foreign subdir-objects])
@@ -42,12 +43,14 @@ AS_IF([test "x$ac_cv_header_security_pam_modules_h" = "xno" \
 ])
 
 PKG_CHECK_MODULES([PICO], [libpico-1 >= 0.0.1, libcrypto, libcurl])
-PKG_CHECK_MODULES([PICOBT], [libpicobt, bluez], [HAVE_BLUETOOTH=1], [HAVE_BLUETOOTH=0])
+PKG_CHECK_MODULES([PICOBT], [libpicobt, bluez], HAVE_BLUETOOTH=1, HAVE_BLUETOOTH=0)
 PKG_CHECK_MODULES([GLIB], [gio-unix-2.0, glib-2.0, libsoup-2.4])
 PKG_CHECK_MODULES([DBUSGLIB], [dbus-glib-1])
 PKG_CHECK_MODULES([GTK], [gtk+-3.0], [HAVE_GTK=1], [HAVE_GTK=0])
 PKG_CHECK_MODULES([QRENCODE], [libqrencode])
 PKG_CHECK_MODULES([URLDISPATCHER], [url-dispatcher-1], [HAVE_URLDISPATCH=1], [HAVE_URLDISPATCH=0])
+AC_CHECK_LIB([picobt], [bt_init])
+AC_CHECK_LIB([bluetooth], [hci_get_route])
 
 # Checks for the Check libraries. See https://libcheck.github.io/check/
 PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
@@ -64,13 +67,13 @@ AC_MSG_CHECKING([for -z,nodelete linker flag])
 ax_check_save_flags=$LDFLAGS
 LDFLAGS="$LDFLAGS -Wl,-z,nodelete"
 AC_LINK_IFELSE(
-      [AC_LANG_PROGRAM([], [])],
-      [AC_DEFINE([LDNODELETE], [-Wl,-z,nodelete],
-		 [Define if -z,nodelete linker flag is available])
-      AC_MSG_RESULT([yes])],
-      [AC_DEFINE([LDNODELETE], [],
-		 [Avoid using -z,nodelete linker flag])
-      AC_MSG_RESULT([no])])
+	[AC_LANG_PROGRAM([], [])],
+	[AC_DEFINE([LDNODELETE], [-Wl,-z,nodelete],
+		[Define if -z,nodelete linker flag is available])
+	AC_MSG_RESULT([yes])],
+	[AC_DEFINE([LDNODELETE], [],
+		[Define if -z,nodelete linker flag is available])
+	AC_MSG_RESULT([no])])
 LDFLAGS=$ax_check_save_flags
 
 AC_MSG_CHECKING([whether certain PAM functions require const arguments])
@@ -114,7 +117,6 @@ AS_IF([test "x$with_systemdsystemunitdir" != "xno"],
 	[AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])])
 AM_CONDITIONAL([HAVE_SYSTEMD], [test "x$with_systemdsystemunitdir" != "xno"])
 
-AC_CONFIG_HEADER(config.h)
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
                  service/Makefile

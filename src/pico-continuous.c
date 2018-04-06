@@ -107,7 +107,10 @@
 #include "pico/messageservicereauth.h"
 #include "pico/channel_bt.h"
 #include "pico/debug.h"
-//#include "picobt/btmain.h"
+
+#ifdef HAVE_LIBPICOBT
+#include "picobt/btmain.h"
+#endif // #ifdef HAVE_LIBPICOBT
 
 #include "log.h"
 #include "processstore.h"

@@ -52,6 +52,7 @@
 #include <stdlib.h>
 #include <syslog.h>
 #include <stdbool.h>
+#include <string.h>
 #include <glib.h>
 #include <gio/gio.h>
 #include <libsoup/soup.h>

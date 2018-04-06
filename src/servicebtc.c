@@ -61,6 +61,7 @@
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
+#include <bluetooth/rfcomm.h>
 #include "pico/pico.h"
 #include "pico/log.h"
 #include "pico/keypair.h"
@@ -696,7 +697,7 @@ static int servicebtc_start_listen(ServiceBtc * servicebtc) {
 	bool result;
 	GSocketAddress * address;
 	GError * error;
-	struct sockaddr_rc loc_addr = { 0 };
+	struct sockaddr_rc loc_addr = {0};
 	int check;
 	int channel;
 
