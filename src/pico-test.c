@@ -66,10 +66,10 @@
 #include "pico/keypairing.h"
 #include "pico/sigmaverifier.h"
 #include "pico/cryptosupport.h"
-#include <picobt/bt.h>
-#include <picobt/devicelist.h>
-#include <security/pam_appl.h>
-#include <security/pam_misc.h>
+//#include <picobt/bt.h>
+//#include <picobt/devicelist.h>
+//#include <security/pam_appl.h>
+//#include <security/pam_misc.h>
 #include <dbus/dbus.h>
 
 #include "log.h"
@@ -203,6 +203,7 @@ int notify_service_start_auth() {
 	result = true;
 	msg = NULL;
 	reply = NULL;
+	handle = 0;
 	LOG(LOG_INFO, "Getting dbus proxy for continuous auth server\n");
 
 	connection = dbus_bus_get(DBUS_BUS_SYSTEM, &error);

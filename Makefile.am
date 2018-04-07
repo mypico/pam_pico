@@ -9,7 +9,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 pamdir = $(libdir)/security
 
 #bin_PROGRAMS      = pico-pair pico-continuous pico-test
-bin_PROGRAMS      = pico-continuous
+bin_PROGRAMS      = pico-continuous pico-test
 pam_LTLIBRARIES   = pam_pico.la 
 noinst_LTLIBRARIES   = lib_pam_test.la lib_service_test.la lib_mockpam.la lib_mockbt.la lib_mockdbus.la
 
