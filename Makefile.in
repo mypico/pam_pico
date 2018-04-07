@@ -90,7 +90,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = pico-continuous$(EXEEXT)
+bin_PROGRAMS = pico-continuous$(EXEEXT) pico-test$(EXEEXT)
 TESTS = tests/test_pam$(EXEEXT) tests/test_auth$(EXEEXT) \
 	tests/test_beacons$(EXEEXT)
 check_PROGRAMS = $(am__EXEEXT_1)
@@ -217,6 +217,13 @@ pico_continuous_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(pico_continuous_CFLAGS) $(CFLAGS) $(pico_continuous_LDFLAGS) \
 	$(LDFLAGS) -o $@
+am_pico_test_OBJECTS = src/pico_test-pico-test.$(OBJEXT) \
+	$(am__objects_1)
+pico_test_OBJECTS = $(am_pico_test_OBJECTS)
+pico_test_LDADD = $(LDADD)
+pico_test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(pico_test_CFLAGS) \
+	$(CFLAGS) $(pico_test_LDFLAGS) $(LDFLAGS) -o $@
 tests_test_auth_SOURCES = tests/test_auth.c
 tests_test_auth_OBJECTS = tests/tests_test_auth-test_auth.$(OBJEXT)
 tests_test_auth_DEPENDENCIES = .libs/lib_pam_test.la \
@@ -279,13 +286,13 @@ am__v_CCLD_1 =
 SOURCES = $(lib_mockbt_la_SOURCES) $(lib_mockdbus_la_SOURCES) \
 	$(lib_mockpam_la_SOURCES) $(lib_pam_test_la_SOURCES) \
 	$(lib_service_test_la_SOURCES) $(pam_pico_la_SOURCES) \
-	$(pico_continuous_SOURCES) tests/test_auth.c \
-	tests/test_beacons.c tests/test_pam.c
+	$(pico_continuous_SOURCES) $(pico_test_SOURCES) \
+	tests/test_auth.c tests/test_beacons.c tests/test_pam.c
 DIST_SOURCES = $(lib_mockbt_la_SOURCES) $(lib_mockdbus_la_SOURCES) \
 	$(lib_mockpam_la_SOURCES) $(lib_pam_test_la_SOURCES) \
 	$(lib_service_test_la_SOURCES) $(pam_pico_la_SOURCES) \
-	$(pico_continuous_SOURCES) tests/test_auth.c \
-	tests/test_beacons.c tests/test_pam.c
+	$(pico_continuous_SOURCES) $(pico_test_SOURCES) \
+	tests/test_auth.c tests/test_beacons.c tests/test_pam.c
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -1096,6 +1103,12 @@ src/pico_continuous-servicervp.$(OBJEXT): src/$(am__dirstamp) \
 pico-continuous$(EXEEXT): $(pico_continuous_OBJECTS) $(pico_continuous_DEPENDENCIES) $(EXTRA_pico_continuous_DEPENDENCIES) 
 	@rm -f pico-continuous$(EXEEXT)
 	$(AM_V_CCLD)$(pico_continuous_LINK) $(pico_continuous_OBJECTS) $(pico_continuous_LDADD) $(LIBS)
+src/pico_test-pico-test.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+
+pico-test$(EXEEXT): $(pico_test_OBJECTS) $(pico_test_DEPENDENCIES) $(EXTRA_pico_test_DEPENDENCIES) 
+	@rm -f pico-test$(EXEEXT)
+	$(AM_V_CCLD)$(pico_test_LINK) $(pico_test_OBJECTS) $(pico_test_LDADD) $(LIBS)
 tests/$(am__dirstamp):
 	@$(MKDIR_P) tests
 	@: > tests/$(am__dirstamp)
@@ -1159,6 +1172,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-service.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-servicebtc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_continuous-servicervp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pico_test-pico-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/tests_test_auth-test_auth.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/tests_test_beacons-test_beacons.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/tests_test_pam-test_pam.Po@am__quote@
@@ -1434,6 +1448,20 @@ src/pico_continuous-servicervp.obj: src/servicervp.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/servicervp.c' object='src/pico_continuous-servicervp.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_continuous_CFLAGS) $(CFLAGS) -c -o src/pico_continuous-servicervp.obj `if test -f 'src/servicervp.c'; then $(CYGPATH_W) 'src/servicervp.c'; else $(CYGPATH_W) '$(srcdir)/src/servicervp.c'; fi`
+
+src/pico_test-pico-test.o: src/pico-test.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_test_CFLAGS) $(CFLAGS) -MT src/pico_test-pico-test.o -MD -MP -MF src/$(DEPDIR)/pico_test-pico-test.Tpo -c -o src/pico_test-pico-test.o `test -f 'src/pico-test.c' || echo '$(srcdir)/'`src/pico-test.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/pico_test-pico-test.Tpo src/$(DEPDIR)/pico_test-pico-test.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/pico-test.c' object='src/pico_test-pico-test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_test_CFLAGS) $(CFLAGS) -c -o src/pico_test-pico-test.o `test -f 'src/pico-test.c' || echo '$(srcdir)/'`src/pico-test.c
+
+src/pico_test-pico-test.obj: src/pico-test.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_test_CFLAGS) $(CFLAGS) -MT src/pico_test-pico-test.obj -MD -MP -MF src/$(DEPDIR)/pico_test-pico-test.Tpo -c -o src/pico_test-pico-test.obj `if test -f 'src/pico-test.c'; then $(CYGPATH_W) 'src/pico-test.c'; else $(CYGPATH_W) '$(srcdir)/src/pico-test.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/pico_test-pico-test.Tpo src/$(DEPDIR)/pico_test-pico-test.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/pico-test.c' object='src/pico_test-pico-test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pico_test_CFLAGS) $(CFLAGS) -c -o src/pico_test-pico-test.obj `if test -f 'src/pico-test.c'; then $(CYGPATH_W) 'src/pico-test.c'; else $(CYGPATH_W) '$(srcdir)/src/pico-test.c'; fi`
 
 tests/tests_test_auth-test_auth.o: tests/test_auth.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(tests_test_auth_CFLAGS) $(CFLAGS) -MT tests/tests_test_auth-test_auth.o -MD -MP -MF tests/$(DEPDIR)/tests_test_auth-test_auth.Tpo -c -o tests/tests_test_auth-test_auth.o `test -f 'tests/test_auth.c' || echo '$(srcdir)/'`tests/test_auth.c
