@@ -947,6 +947,7 @@ void serviceble_advertising_start(ServiceBle * serviceble, bool continuous) {
 	g_signal_connect(serviceble->leadvertisement, "handle-release", G_CALLBACK(&on_handle_release), NULL);
 
 	// Set the advertisement properties
+	leadvertisement1_set_local_name(serviceble->leadvertisement, "pico");
 	leadvertisement1_set_service_uuids(serviceble->leadvertisement, uuids);
 	leadvertisement1_set_type_(serviceble->leadvertisement, "peripheral");
 
