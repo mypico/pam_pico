@@ -926,9 +926,8 @@ static void serviceble_finalise(ServiceBle * serviceble) {
 }
 
 void serviceble_advertising_start(ServiceBle * serviceble, bool continuous) {
-	//TODO: Change intial value of uuids[] this to {NULL, NULL}
 	char const * uuid;
-	gchar const * uuids[] = {SERVICE_UUID, NULL};
+	gchar const * uuids[] = {NULL, NULL};
 	ObjectSkeleton * object_advert;
 	GVariantDict dict_options;
 	const gchar * const charflags_outgoing[] = {"notify", NULL};
